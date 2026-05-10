@@ -1,0 +1,22 @@
+# Seed Poet
+> Generate memorable poems using BIP39 mnemonic words
+
+Seed Poet is a tool that creates rhyming poetry using only words from the BIP39
+mnemonic wordlist (2048 words used for cryptocurrency wallet seed phrases).
+
+## Features
+- 12-word and 24-word poem generation
+- Strict phonetic rhymes (couplet structure: AA BB CC...)
+- Syllable-matched lines for consistent rhythm
+- VERB + ADJECTIVE + NOUN sentence structure
+
+## Purpose
+Create memorable, poetic representations of BIP39-compatible word sequences.
+Useful for memorization exercises or creative exploration of the BIP39 vocabulary.
+
+## Links
+- Website: https://seedpoet.com
+- About: https://seedpoet.com/about
+
+## Developer
+Developed by OxiSoft.io

@@ -1,0 +1,11 @@
+# Seed Poet - seedpoet.com
+# Allow indexing of landing and about pages only
+
+User-agent: *
+Allow: /
+Allow: /about
+Disallow: /12
+Disallow: /24
+
+# Sitemap
+Sitemap: https://seedpoet.com/sitemap.xml

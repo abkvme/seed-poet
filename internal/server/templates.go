@@ -1,0 +1,24 @@
+package server
+
+import (
+	"embed"
+	"html/template"
+)
+
+//go:embed templates/*.html
+var templateFS embed.FS
+
+//go:embed static/*
+var staticFS embed.FS
+
+var (
+	landingTemplate *template.Template
+	poemTemplate    *template.Template
+	aboutTemplate   *template.Template
+)
+
+func init() {
+	landingTemplate = template.Must(template.ParseFS(templateFS, "templates/landing.html"))
+	poemTemplate = template.Must(template.ParseFS(templateFS, "templates/poem.html"))
+	aboutTemplate = template.Must(template.ParseFS(templateFS, "templates/about.html"))
+}

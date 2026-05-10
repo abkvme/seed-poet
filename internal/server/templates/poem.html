@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.WordCount}}-Word Poem - Seed Poet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #0d1f0d 0%, #1a2f1a 50%, #0f2518 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #e8f5e8;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 700px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .poem {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .poem pre {
+            font-family: 'Georgia', serif;
+            font-size: 1.4rem;
+            line-height: 2;
+            white-space: pre-wrap;
+            color: #e8f5e8;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(34, 197, 94, 0.3);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #6ee7a0;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: rgba(34, 197, 94, 0.5);
+            color: #fff;
+        }
+        .copy-btn.copied {
+            background: rgba(34, 197, 94, 0.6);
+            color: #fff;
+        }
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        a.btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        a.btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+        }
+        a.btn.secondary {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        a.btn.secondary:hover {
+            background: rgba(34, 197, 94, 0.3);
+        }
+        .home-link {
+            margin-top: 1.5rem;
+        }
+        .home-link a {
+            color: #6ee7a0;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+        .home-link a:hover {
+            color: #4ade80;
+        }
+        .footer {
+            position: fixed;
+            bottom: 1rem;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #3a5a3a;
+        }
+        .footer a {
+            color: #4a7a4a;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: #6ee7a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{.WordCount}}-Word Poem</h1>
+        <div class="poem">
+            <button class="copy-btn" onclick="copyPoem()">Copy</button>
+            <pre id="poem-text">{{.Poem}}</pre>
+        </div>
+        <div class="buttons">
+            <a href="/{{.WordCount}}" class="btn">Generate Another</a>
+            {{if eq .WordCount 12}}
+            <a href="/24" class="btn secondary">Try 24 Words</a>
+            {{else}}
+            <a href="/12" class="btn secondary">Try 12 Words</a>
+            {{end}}
+        </div>
+        <div class="home-link">
+            <a href="/">&#x1F331; Seed Poet</a>
+        </div>
+    </div>
+    <div class="footer">
+        Developed by <a href="https://oxisoft.io" target="_blank">OxiSoft.io</a>
+    </div>
+    <script>
+        function copyPoem() {
+            var text = document.getElementById('poem-text').textContent;
+            navigator.clipboard.writeText(text).then(function() {
+                var btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

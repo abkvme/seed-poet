@@ -1,0 +1,10 @@
+.git
+.gitignore
+scripts/
+data/
+__pycache__/
+*.pyc
+seedpoet
+Makefile
+Dockerfile
+.DS_Store
