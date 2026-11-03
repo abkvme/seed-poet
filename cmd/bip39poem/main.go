@@ -13,7 +13,7 @@ import (
 
 const (
 	appName    = "Seed Poet"
-	appVersion = "1.0.0"
+	appVersion = "1.1.0"
 )
 
 func main() {
@@ -53,7 +53,10 @@ func main() {
 
 func runCLI(gen *generator.Generator, wordCount int) {
 	fmt.Printf("%s v%s\n\n", appName, appVersion)
-	poem := gen.Generate(wordCount)
+	poem, err := gen.Generate(wordCount)
+	if err != nil {
+		log.Fatalf("Generate: %v", err)
+	}
 	fmt.Println(poem.Format())
 }
 

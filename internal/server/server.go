@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/abkvme/seed-poet/internal/generator"
 )
@@ -35,13 +36,33 @@ func (s *Server) SetupRoutes() http.Handler {
 	mux.HandleFunc("/llm.txt", s.handleLLMs)
 	mux.HandleFunc("/sitemap.xml", s.handleSitemap)
 
-	return mux
+	return securityHeaders(mux)
+}
+
+// securityHeaders applies to every response. Poem pages carry a seed phrase,
+// so nothing may be cached by the browser or a proxy, and no referrer leaks.
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h := w.Header()
+		h.Set("Cache-Control", "no-store")
+		h.Set("Referrer-Policy", "no-referrer")
+		h.Set("X-Content-Type-Options", "nosniff")
+		h.Set("X-Frame-Options", "DENY")
+		next.ServeHTTP(w, r)
+	})
 }
 
 func (s *Server) Run(addr string) error {
-	handler := s.SetupRoutes()
+	srv := &http.Server{
+		Addr:              addr,
+		Handler:           s.SetupRoutes(),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
 	log.Printf("Starting server on %s", addr)
-	return http.ListenAndServe(addr, handler)
+	return srv.ListenAndServe()
 }
 
 func (s *Server) handleLanding(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +87,12 @@ func (s *Server) handlePoem24Web(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlePoemWeb(w http.ResponseWriter, r *http.Request, wordCount int) {
-	poem := s.gen.Generate(wordCount)
+	poem, err := s.gen.Generate(wordCount)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("Generate error: %v", err)
+		return
+	}
 
 	data := PoemPageData{
 		WordCount: wordCount,
