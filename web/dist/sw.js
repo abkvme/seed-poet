@@ -2,8 +2,8 @@
 // It caches only the site's own static files. Poems are never fetched, so
 // there is nothing secret to cache. POST requests (no-JS server poems) pass through.
 'use strict';
-const CACHE = 'seedpoet-2.0.2-3cb2c8a4';
-const URLS = ["/","/12","/24","/about","/assets/app.6186cf0fc4.js","/assets/data.6d82e27841.js","/assets/pdf.3b53484cde.js","/assets/seedpoet.a83aedc3c1.js","/assets/site.41c80ded3a.js","/assets/site.59a02ef349.css","/expired","/favicon.ico","/favicon.svg","/icons/icon-192.png","/manifest.webmanifest"];
+const CACHE = 'seedpoet-2.0.3-b4eb5798';
+const URLS = ["/","/12","/24","/about","/assets/app.6186cf0fc4.js","/assets/data.6d82e27841.js","/assets/pdf.3b53484cde.js","/assets/seedpoet.a576e1aa73.js","/assets/site.8bce1e819a.js","/assets/site.d0015a5e60.css","/expired","/favicon.ico","/favicon.svg","/icons/icon-192.png","/manifest.webmanifest"];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(URLS)).then(() => self.skipWaiting()));
