@@ -161,7 +161,15 @@ func TestPagesAndCredit(t *testing.T) {
 			t.Errorf("%s: strength disclaimer missing", path)
 		}
 	}
-	for _, path := range []string{"/static/css/strength.css", "/static/css/poem.css", "/static/js/poem.js", "/robots.txt"} {
+	if !strings.Contains(do(h, http.MethodGet, "/", "", nil).Body.String(), `href="https://github.com/abkvme/seed-poet"`) {
+		t.Error("/: GitHub link missing")
+	}
+	for _, path := range []string{"/12", "/24"} {
+		if !strings.Contains(do(h, http.MethodGet, path, "", nil).Body.String(), `id="hide-btn"`) {
+			t.Errorf("%s: hide button missing", path)
+		}
+	}
+	for _, path := range []string{"/static/css/strength.css", "/static/css/poem.css", "/static/js/poem.js", "/static/js/pdf.js", "/robots.txt"} {
 		if rec := do(h, http.MethodGet, path, "", nil); rec.Code != http.StatusOK {
 			t.Errorf("%s: status %d", path, rec.Code)
 		}

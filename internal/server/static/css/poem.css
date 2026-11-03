@@ -41,10 +41,14 @@ h1 {
     white-space: pre-wrap;
     color: #e8f5e8;
 }
-.copy-btn {
+.poem-actions {
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+}
+.copy-btn {
     background: rgba(34, 197, 94, 0.3);
     border: 1px solid rgba(34, 197, 94, 0.4);
     color: #6ee7a0;
@@ -167,4 +171,31 @@ a.btn.secondary:hover {
 .timer-note {
     font-size: 0.8rem;
     color: #8fb08f;
+}
+.hide-btn {
+    display: inline-block;
+    margin-top: 1.25rem;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid rgba(252, 165, 165, 0.5);
+    border-radius: 8px;
+    background: rgba(252, 165, 165, 0.08);
+    color: #fecaca;
+    font-family: inherit;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.hide-btn:hover,
+.hide-btn:focus-visible {
+    background: rgba(252, 165, 165, 0.2);
+    color: #fff;
+}
+.hide-btn.attention {
+    border-color: #fca5a5;
+    background: rgba(252, 165, 165, 0.22);
+    color: #fff;
+}
+.poem {
+    padding-top: 3.25rem;
 }

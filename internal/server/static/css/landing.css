@@ -91,3 +91,6 @@ a.btn:hover {
 .footer a:hover {
     color: #6ee7a0;
 }
+.container > .strength-btn {
+    margin-top: 1.5rem;
+}

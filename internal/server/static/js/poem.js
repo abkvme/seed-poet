@@ -11,6 +11,8 @@
   var status = document.getElementById('poem-status');
   var copyBtn = document.getElementById('copy-btn');
   var timerBox = document.getElementById('poem-timer');
+  var hideBtn = document.getElementById('hide-btn');
+  var pdfBtn = document.getElementById('pdf-btn');
   var timerValue = document.getElementById('timer-value');
   var ttl = parseInt(box.getAttribute('data-ttl'), 10) || 900;
   var words = box.getAttribute('data-words') === '24' ? 24 : 12;
@@ -24,7 +26,9 @@
     text.textContent = '';
     while (text.firstChild) text.removeChild(text.firstChild);
     copyBtn.hidden = true;
+    pdfBtn.hidden = true;
     timerBox.hidden = true;
+    hideBtn.hidden = true;
     status.className = 'status expired';
     status.textContent = message;
   }
@@ -47,7 +51,9 @@
     text.textContent = poem;
     expiresAt = Date.now() + ttl * 1000;
     copyBtn.hidden = false;
+    pdfBtn.hidden = !window.SeedPoetPDF;
     timerBox.hidden = false;
+    hideBtn.hidden = false;
     tick();
     timer = setInterval(tick, 1000);
   }
@@ -62,11 +68,38 @@
   document.addEventListener('visibilitychange', tick);
   window.addEventListener('focus', tick);
 
+  // The user can remove the poem at once, e.g. right after copying or writing it down.
+  hideBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    wipe('Poem hidden. It was never stored and cannot be shown again.');
+  });
+
+  function nudgeHide(label) {
+    hideBtn.classList.add('attention');
+    hideBtn.textContent = label + '. Hide the poem now';
+  }
+
+  // PDF is built in the browser from the text on screen; nothing is sent anywhere.
+  pdfBtn.addEventListener('click', function () {
+    if (wiped || !window.SeedPoetPDF) return;
+    var lines = text.textContent.split('\n').filter(function (l) { return l.trim(); });
+    var url = URL.createObjectURL(window.SeedPoetPDF.build(lines));
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'seed-poem-' + words + '-words.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    nudgeHide('Downloaded');
+  });
+
   copyBtn.addEventListener('click', function () {
     if (wiped || !navigator.clipboard) return;
     navigator.clipboard.writeText(text.textContent).then(function () {
       copyBtn.textContent = 'Copied!';
       copyBtn.classList.add('copied');
+      nudgeHide('Copied');
       setTimeout(function () {
         copyBtn.textContent = 'Copy';
         copyBtn.classList.remove('copied');
