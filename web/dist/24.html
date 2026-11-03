@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>24-Word Rhyming Seed Phrase | Seed Poet</title>
+<meta name="description" content="Your 24-word BIP39 seed phrase as a rhyming poem, generated in your browser. Never sent or stored, hidden after 15 minutes.">
+<link rel="canonical" href="https://seedpoet.com/24">
+<meta name="robots" content="noindex, follow">
+<meta name="author" content="OxiSoft">
+<meta name="application-name" content="Seed Poet">
+<meta name="apple-mobile-web-app-title" content="Seed Poet">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#020a05">
+<meta name="color-scheme" content="dark">
+<meta name="format-detection" content="telephone=no">
+<meta name="referrer" content="no-referrer">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Seed Poet">
+<meta property="og:title" content="Seed Poet: your keys, in verse">
+<meta property="og:description" content="A valid BIP39 seed phrase as a rhyming poem. Written by your browser, never sent anywhere, gone in 15 minutes.">
+<meta property="og:url" content="https://seedpoet.com/24">
+<meta property="og:image" content="https://seedpoet.com/og.png">
+<meta property="og:image:secure_url" content="https://seedpoet.com/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Seed Poet: your BIP39 seed phrase as a rhyming poem, generated in your browser">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Seed Poet: your keys, in verse">
+<meta name="twitter:description" content="A valid BIP39 seed phrase as a rhyming poem. Written by your browser, never sent anywhere, gone in 15 minutes.">
+<meta name="twitter:image" content="https://seedpoet.com/og.png">
+<meta name="twitter:image:alt" content="Seed Poet: your BIP39 seed phrase as a rhyming poem, generated in your browser">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/assets/site.59a02ef349.css" integrity="sha384-CyhBL2T8&#43;wX/KMghetl2&#43;V/ZWrHpT3kA2F5Mco7wrHOWf0m7&#43;Sl2UEKF8gAzXd5D">
+<link rel="author" href="/about">
+<link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<canvas id="rain" aria-hidden="true"></canvas>
+<header class="site-header">
+  <a class="brand" href="/" aria-label="Seed Poet home"><img src="/favicon.svg" alt="" width="30" height="30"><span>Seed<b>//</b>Poet</span></a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/12">12 words</a>
+    <a href="/24" aria-current="page">24 words</a>
+    <a href="/about">About</a>
+    <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>
+  </nav>
+</header>
+<main id="main">
+<section class="poem-wrap" id="poem" data-words="24" data-ttl="900" data-autostart="1" data-path="page" aria-live="polite">
+  <div class="poem-head">
+    <div>
+      <p class="hud">Seed<span>.</span>Poet <span>//</span> BIP39 <span>//</span> on-device</p>
+      <h1 id="poem-title">24-word poem</h1>
+    </div>
+    <div class="timer" id="timer" hidden>
+      <span class="timer-note">Hidden automatically for your security</span>
+      <span class="timer-value" id="timer-value">15:00</span>
+    </div>
+  </div>
+  <div class="poem-grid">
+  <div class="term">
+    <div class="term-body">
+      <ol class="poem-lines" id="poem-lines" translate="no"></ol>
+      <p class="poem-status" id="poem-status" role="status"></p>
+      <div class="actions" id="actions" hidden>
+        <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
+        <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
+        <button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>
+      </div>
+      <details class="numbered" id="numbered" hidden>
+        <summary>Numbered words, in wallet order</summary>
+        <ol id="numbered-list" translate="no"></ol>
+      </details>
+      <noscript><div class="noscript-box" id="noscript-box">
+        <p>JavaScript is off, so this page cannot write a poem on your device. You can let our server write one instead: it is shown once, never stored or logged, and removed from the page after 15 minutes.</p>
+        <form method="post" action="/nojs/24"><button class="btn small ghost" type="submit">Generate on the server</button></form>
+      </div></noscript>
+    </div>
+  </div>
+  <aside class="chains" aria-labelledby="chains-title">
+  <p class="hud" id="chains-title">Works with</p>
+  <ul>
+    <li><a href="/about#blockchains"><b>BTC</b> Bitcoin</a></li>
+    <li><a href="/about#blockchains"><b>ETH</b> Ethereum</a></li>
+    <li><a href="/about#blockchains"><b>SOL</b> Solana</a></li>
+    <li><a href="/about#blockchains"><b>ADA</b> Cardano <i>24w</i></a></li>
+    <li><a href="/about#blockchains"><b>EVM</b> Polygon, BNB, Base</a></li>
+    <li><a href="/about#blockchains"><b>DOT</b> Polkadot</a></li>
+    <li><a href="/about#blockchains"><b>ATOM</b> Cosmos</a></li>
+    <li><a href="/about#blockchains"><b>TRX</b> Tron</a></li>
+    <li><a href="/about#blockchains"><b>LTC</b> Litecoin</a></li>
+    <li><a href="/about#blockchains"><b>DOGE</b> Dogecoin</a></li>
+  </ul>
+  <p class="chains-note">Any BIP39 wallet: Ledger, Trezor, MetaMask, Phantom, Trust Wallet, Exodus</p>
+</aside>
+  </div>
+  <p class="notice">This poem is written by your browser and exists only on this page. Nothing is sent to any server. Write it down on paper or print the PDF, then delete the PDF file. If you copy it, clear your clipboard.</p>
+  <div class="below">
+    <div class="cta">
+      <a class="btn" href="/24" data-generate="24">New poem</a>
+      <a class="btn ghost" id="switch-btn" href="/12" data-generate="12">Switch to 12</a>
+    </div>
+    <button class="strength-btn" type="button" popovertarget="strength-info">&#x26A0; How strong is a poem seed?</button>
+<div id="strength-info" class="popup" popover role="dialog" aria-labelledby="strength-title">
+  <h2 id="strength-title">How strong is a poem seed?</h2>
+  <p>A Seed Poet poem is a valid BIP39 phrase, but it is a little weaker than a fully random one. Rhymes, syllable counts and the verb, adjective, noun pattern limit which words can go where.</p>
+  <ul>
+    <li><strong>12 words:</strong> about 88 bits of randomness (fully random BIP39: 128 bits)</li>
+    <li><strong>24 words:</strong> about 176 bits (fully random BIP39: 256 bits)</li>
+  </ul>
+  <p>Even 88 bits is about 3 &times; 10<sup>26</sup> possible poems, far beyond any known brute-force attack, including one by someone who knows you used Seed Poet. These figures are our estimate.</p>
+  <p><strong>Our advice:</strong> for a wallet that holds real value, use 24 words, and for the highest safety use the <a href="/seedpoet-offline.html" download>offline version</a> on a computer without internet.</p>
+  <button class="btn small" type="button" popovertarget="strength-info" popovertargetaction="hide">Got it</button>
+</div>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <p class="credit">Developed by <a href="https://oxisoft.io" rel="noopener">OxiSoft</a></p>
+  <nav aria-label="Footer">
+    <a href="/about#privacy">Privacy</a>
+    <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
+    <a href="/seedpoet-offline.html" download>Offline version</a>
+    <span>v2.0.0</span>
+  </nav>
+</footer>
+<script src="/assets/data.6d82e27841.js" integrity="sha384-SQQ7/I8zl7JwAKFksVNkrOYKFH2NPL6Phqcht8LD5gRDdzns9giwsZO4/SkvUY59" defer></script>
+<script src="/assets/seedpoet.7e9db08f38.js" integrity="sha384-HdozXWXva5XbpVzb61a7M0eYQf7hb4rQs8B1gS23VJe1LZYBVRZTfRGVjWFOCdSV" defer></script>
+<script src="/assets/pdf.3b53484cde.js" integrity="sha384-vQwK27xOJUP5WORLBFv1TXYoutKR1XSk6gRVWq3ChKA3i0uLHBThpVz2r0APhem/" defer></script>
+<script src="/assets/app.6186cf0fc4.js" integrity="sha384-ThE4Bb&#43;DvxrxI6hYW4tJt0XKAhqPHxAzTS6MC9yGVlnHvb&#43;GnpgUpNYmSEXIyoUp" defer></script>
+<script src="/assets/site.41c80ded3a.js" integrity="sha384-L3uNjfdKly2pd7GsI6yhw96WmZlcOi33tq1YGd2RbvvCCGmi3yHr3zRNbbIuyu9Z" defer></script>
+</body>
+</html>

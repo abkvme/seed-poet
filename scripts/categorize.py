@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Categorize BIP39 words into verbs, adjectives, and nouns for poem structure."""
 
+import os
+
+import datafile
+
 # VERBS - action words that work as imperatives (commands)
 VERBS = {
     "abandon", "absorb", "abuse", "access", "accuse", "achieve", "acquire", "act",
@@ -394,7 +398,7 @@ NOUNS = {
 
 def main():
     # Read all BIP39 words
-    with open('../data/english.txt', 'r') as f:
+    with open(os.path.join(os.path.dirname(__file__), '..', 'data', 'english.txt')) as f:
         all_words = [line.strip() for line in f if line.strip()]
 
     all_words_set = set(all_words)
@@ -404,45 +408,11 @@ def main():
     adjectives = sorted([w for w in ADJECTIVES if w in all_words_set])
     nouns = sorted([w for w in NOUNS if w in all_words_set])
 
-    # Generate Go code
-    go_code = '''package wordlist
+    data = datafile.load()
+    data["verbs"], data["adjectives"], data["nouns"] = verbs, adjectives, nouns
+    datafile.save(data)
 
-// BIP39Words contains all 2048 BIP39 English mnemonic words.
-var BIP39Words = []string{
-'''
-    for i in range(0, len(all_words), 8):
-        chunk = all_words[i:i+8]
-        go_code += '\t' + ', '.join(f'"{w}"' for w in chunk) + ',\n'
-    go_code += '}\n\n'
-
-    # Verbs (Position 1)
-    go_code += '// Verbs are action words for starting lines (imperatives).\n'
-    go_code += 'var Verbs = []string{\n'
-    for i in range(0, len(verbs), 8):
-        chunk = verbs[i:i+8]
-        go_code += '\t' + ', '.join(f'"{w}"' for w in chunk) + ',\n'
-    go_code += '}\n\n'
-
-    # Adjectives (Position 2)
-    go_code += '// Adjectives are describing words for the middle position.\n'
-    go_code += 'var Adjectives = []string{\n'
-    for i in range(0, len(adjectives), 8):
-        chunk = adjectives[i:i+8]
-        go_code += '\t' + ', '.join(f'"{w}"' for w in chunk) + ',\n'
-    go_code += '}\n\n'
-
-    # Nouns (Position 3)
-    go_code += '// Nouns are things for the end position (rhyming).\n'
-    go_code += 'var Nouns = []string{\n'
-    for i in range(0, len(nouns), 8):
-        chunk = nouns[i:i+8]
-        go_code += '\t' + ', '.join(f'"{w}"' for w in chunk) + ',\n'
-    go_code += '}\n'
-
-    with open('../internal/wordlist/words.go', 'w') as f:
-        f.write(go_code)
-
-    print(f"Generated words.go:")
+    print(f"Updated data/seedpoet.json:")
     print(f"  - All BIP39 words: {len(all_words)}")
     print(f"  - Verbs: {len(verbs)}")
     print(f"  - Adjectives: {len(adjectives)}")

@@ -1,26 +1,26 @@
 package server
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"strings"
 	"testing"
 
-	"github.com/abkvme/seed-poet/internal/bip39"
-	"github.com/abkvme/seed-poet/internal/generator"
-	"github.com/abkvme/seed-poet/internal/rhyme"
-	"github.com/abkvme/seed-poet/internal/wordlist"
+	"github.com/abkvme/seed-poet/seedpoet"
 )
 
-func handler() http.Handler {
-	gen := generator.New(wordlist.Verbs, wordlist.Adjectives, wordlist.Nouns, rhyme.BuildPhoneticIndex())
-	return New(gen).SetupRoutes()
+func handler(t *testing.T) http.Handler {
+	t.Helper()
+	s, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return s.Handler()
 }
 
-func do(h http.Handler, method, path, body string, hdr map[string]string) *httptest.ResponseRecorder {
-	req := httptest.NewRequest(method, path, strings.NewReader(body))
+func do(h http.Handler, method, path string, hdr map[string]string) *httptest.ResponseRecorder {
+	req := httptest.NewRequest(method, path, nil)
 	for k, v := range hdr {
 		req.Header.Set(k, v)
 	}
@@ -29,154 +29,124 @@ func do(h http.Handler, method, path, body string, hdr map[string]string) *httpt
 	return rec
 }
 
-func checkPrivateHeaders(t *testing.T, path string, rec *httptest.ResponseRecorder) {
-	t.Helper()
-	want := map[string]string{
-		"Cache-Control":   "no-store, max-age=0",
-		"Referrer-Policy": "no-referrer",
-		"X-Frame-Options": "DENY",
-		"X-Robots-Tag":    "noindex, nofollow, noarchive",
-	}
-	for k, v := range want {
-		if got := rec.Header().Get(k); got != v {
-			t.Errorf("%s: %s = %q, want %q", path, k, got, v)
-		}
-	}
-	csp := rec.Header().Get("Content-Security-Policy")
-	if !strings.Contains(csp, "default-src 'none'") || strings.Contains(csp, "unsafe") {
-		t.Errorf("%s: weak CSP %q", path, csp)
-	}
-}
-
-// A GET (what crawlers, link previews and history use) must never carry a seed.
-func TestPoemShellHasNoSeed(t *testing.T) {
-	h := handler()
-	pre := regexp.MustCompile(`(?s)<pre id="poem-text"[^>]*>(.*?)</pre>`)
-	for _, path := range []string{"/12", "/24"} {
-		rec := do(h, http.MethodGet, path, "", nil)
+func TestPagesHeadersAndSEO(t *testing.T) {
+	h := handler(t)
+	for _, path := range []string{"/", "/12", "/24", "/about", "/expired"} {
+		rec := do(h, http.MethodGet, path, nil)
 		if rec.Code != http.StatusOK {
 			t.Fatalf("%s: status %d", path, rec.Code)
 		}
-		checkPrivateHeaders(t, path, rec)
-		m := pre.FindStringSubmatch(rec.Body.String())
-		if m == nil {
-			t.Fatalf("%s: poem element missing", path)
-		}
-		if strings.TrimSpace(m[1]) != "" {
-			t.Errorf("%s: GET page contains words %q", path, m[1])
-		}
-		if strings.Contains(rec.Body.String(), "http-equiv=\"refresh\"") {
-			t.Errorf("%s: shell should not auto-refresh", path)
-		}
-	}
-}
-
-func TestAPIPoem(t *testing.T) {
-	h := handler()
-	for _, n := range []int{12, 24} {
-		body := `{"words":` + map[int]string{12: "12", 24: "24"}[n] + `}`
-		rec := do(h, http.MethodPost, "/api/poem", body, map[string]string{
-			"Content-Type": "application/json", "Sec-Fetch-Site": "same-origin"})
-		if rec.Code != http.StatusOK {
-			t.Fatalf("%d: status %d %s", n, rec.Code, rec.Body)
-		}
-		checkPrivateHeaders(t, "/api/poem", rec)
-		var resp apiResponse
-		if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
-			t.Fatal(err)
-		}
-		if resp.TTL != 900 {
-			t.Errorf("ttl %d, want 900", resp.TTL)
-		}
-		if err := bip39.Validate(strings.Fields(strings.Join(resp.Lines, " "))); err != nil {
-			t.Errorf("%d words: %v", n, err)
-		}
-	}
-}
-
-func TestAPIRejects(t *testing.T) {
-	h := handler()
-	cases := []struct {
-		name, method, body string
-		hdr                map[string]string
-		want               int
-	}{
-		{"GET", http.MethodGet, "", nil, http.StatusMethodNotAllowed},
-		{"cross-site", http.MethodPost, `{"words":12}`, map[string]string{"Content-Type": "application/json", "Sec-Fetch-Site": "cross-site"}, http.StatusForbidden},
-		{"form post", http.MethodPost, `{"words":12}`, map[string]string{"Content-Type": "text/plain"}, http.StatusForbidden},
-		{"bad count", http.MethodPost, `{"words":13}`, map[string]string{"Content-Type": "application/json"}, http.StatusBadRequest},
-		{"junk", http.MethodPost, `nope`, map[string]string{"Content-Type": "application/json"}, http.StatusBadRequest},
-	}
-	for _, c := range cases {
-		rec := do(h, c.method, "/api/poem", c.body, c.hdr)
-		if rec.Code != c.want {
-			t.Errorf("%s: status %d, want %d", c.name, rec.Code, c.want)
-		}
-	}
-}
-
-// Without JavaScript: POST returns the poem plus a refresh to /expired after 15 minutes.
-func TestNoScriptFallback(t *testing.T) {
-	h := handler()
-	pre := regexp.MustCompile(`(?s)<pre id="poem-text"[^>]*>(.*?)</pre>`)
-	rec := do(h, http.MethodPost, "/24", "", map[string]string{"Sec-Fetch-Site": "same-origin"})
-	if rec.Code != http.StatusOK {
-		t.Fatalf("status %d", rec.Code)
-	}
-	checkPrivateHeaders(t, "POST /24", rec)
-	body := rec.Body.String()
-	if !strings.Contains(body, `content="900;url=/expired"`) {
-		t.Error("fallback page lacks the 15-minute refresh")
-	}
-	m := pre.FindStringSubmatch(body)
-	if m == nil {
-		t.Fatal("poem missing")
-	}
-	if err := bip39.Validate(strings.Fields(m[1])); err != nil {
-		t.Error(err)
-	}
-	if rec := do(h, http.MethodPost, "/24", "", map[string]string{"Sec-Fetch-Site": "cross-site"}); rec.Code != http.StatusForbidden {
-		t.Errorf("cross-site fallback POST: status %d", rec.Code)
-	}
-}
-
-func TestPagesAndCredit(t *testing.T) {
-	h := handler()
-	for _, path := range []string{"/", "/about", "/12", "/expired"} {
-		rec := do(h, http.MethodGet, path, "", nil)
-		if rec.Code != http.StatusOK {
-			t.Fatalf("%s: status %d", path, rec.Code)
+		csp := rec.Header().Get("Content-Security-Policy")
+		if !strings.Contains(csp, "connect-src 'none'") || strings.Contains(csp, "unsafe") {
+			t.Errorf("%s: CSP %q", path, csp)
 		}
 		body := rec.Body.String()
-		if !strings.Contains(body, `href="https://oxisoft.io"`) || !strings.Contains(body, "OxiSoft") {
-			t.Errorf("%s: OxiSoft credit missing", path)
+		for _, want := range []string{
+			`href="https://oxisoft.io"`, `<meta property="og:image" content="https://seedpoet.com/og.png">`,
+			`name="twitter:card" content="summary_large_image"`, `rel="manifest"`, `rel="icon"`, `<meta name="description"`,
+		} {
+			if !strings.Contains(body, want) {
+				t.Errorf("%s: missing %s", path, want)
+			}
 		}
 		if regexp.MustCompile(`<style|style="|onclick=|<script>`).MatchString(body) {
 			t.Errorf("%s: inline style/script would break the CSP", path)
 		}
-	}
-	for _, path := range []string{"/", "/12", "/24"} {
-		body := do(h, http.MethodGet, path, "", nil).Body.String()
-		if !strings.Contains(body, `popovertarget="strength-info"`) || !strings.Contains(body, "about 88 bits") {
-			t.Errorf("%s: strength disclaimer missing", path)
+		if strings.Contains(body, `<script src=`) && !strings.Contains(body, `integrity="sha384-`) {
+			t.Errorf("%s: script without integrity", path)
 		}
 	}
-	if !strings.Contains(do(h, http.MethodGet, "/", "", nil).Body.String(), `href="https://github.com/abkvme/seed-poet"`) {
-		t.Error("/: GitHub link missing")
+	home := do(h, http.MethodGet, "/", nil).Body.String()
+	for _, want := range []string{`"@type":"WebApplication"`, `rel="canonical" href="https://seedpoet.com/"`, "Bitcoin, Ethereum, Solana", "https://github.com/abkvme/seed-poet"} {
+		if !strings.Contains(home, want) {
+			t.Errorf("/: missing %s", want)
+		}
 	}
+	if !strings.Contains(do(h, http.MethodGet, "/about", nil).Body.String(), `id="blockchains"`) {
+		t.Error("/about: blockchains section missing")
+	}
+	if r := do(h, http.MethodGet, "/24", nil); !strings.Contains(r.Body.String(), `content="noindex`) || r.Header().Get("X-Robots-Tag") == "" {
+		t.Error("/24 must be noindex")
+	}
+}
+
+// Static poem pages carry no poem: the browser writes it.
+func TestPoemPagesHaveNoPoem(t *testing.T) {
+	h := handler(t)
+	re := regexp.MustCompile(`(?s)<ol class="poem-lines" id="poem-lines"[^>]*>(.*?)</ol>`)
 	for _, path := range []string{"/12", "/24"} {
-		if !strings.Contains(do(h, http.MethodGet, path, "", nil).Body.String(), `id="hide-btn"`) {
-			t.Errorf("%s: hide button missing", path)
+		m := re.FindStringSubmatch(do(h, http.MethodGet, path, nil).Body.String())
+		if m == nil || strings.TrimSpace(m[1]) != "" {
+			t.Errorf("%s: poem list must be empty, got %q", path, m)
 		}
 	}
-	for _, path := range []string{"/static/css/strength.css", "/static/css/poem.css", "/static/js/poem.js", "/static/js/pdf.js", "/robots.txt"} {
-		if rec := do(h, http.MethodGet, path, "", nil); rec.Code != http.StatusOK {
-			t.Errorf("%s: status %d", path, rec.Code)
+}
+
+func TestNoJSFallback(t *testing.T) {
+	h := handler(t)
+	rec := do(h, http.MethodPost, "/nojs/24", map[string]string{"Sec-Fetch-Site": "same-origin"})
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status %d", rec.Code)
+	}
+	if rec.Header().Get("Cache-Control") != "no-store, max-age=0" {
+		t.Error("nojs page must be no-store")
+	}
+	body := rec.Body.String()
+	if !strings.Contains(body, `content="900;url=/expired"`) {
+		t.Error("missing 15-minute refresh")
+	}
+	words := regexp.MustCompile(`(?s)<ol id="numbered-list"[^>]*>(.*?)</ol>`).FindStringSubmatch(body)
+	if words == nil {
+		t.Fatal("numbered list missing")
+	}
+	list := regexp.MustCompile(`<li>(\w+)</li>`).FindAllStringSubmatch(words[1], -1)
+	var ws []string
+	for _, m := range list {
+		ws = append(ws, m[1])
+	}
+	if len(ws) != 24 {
+		t.Fatalf("got %d words", len(ws))
+	}
+	if err := seedpoet.Validate(ws); err != nil {
+		t.Error(err)
+	}
+	if r := do(h, http.MethodPost, "/nojs/24", map[string]string{"Sec-Fetch-Site": "cross-site"}); r.Code != http.StatusForbidden {
+		t.Errorf("cross-site: %d", r.Code)
+	}
+	if r := do(h, http.MethodPost, "/nojs/13", nil); r.Code != http.StatusNotFound {
+		t.Errorf("/nojs/13: %d", r.Code)
+	}
+	if r := do(h, http.MethodGet, "/nojs/12", nil); r.Code != http.StatusNotFound && r.Code != http.StatusMethodNotAllowed {
+		t.Errorf("GET /nojs/12: %d", r.Code)
+	}
+}
+
+func TestStaticFiles(t *testing.T) {
+	h := handler(t)
+	for path, ct := range map[string]string{
+		"/manifest.webmanifest": "application/manifest+json", "/sw.js": "javascript", "/robots.txt": "text/plain",
+		"/sitemap.xml": "xml", "/llms.txt": "text/plain", "/favicon.ico": "image", "/favicon.svg": "image/svg",
+		"/og.png": "image/png", "/icons/icon-512.png": "image/png", "/seedpoet-offline.html": "text/html",
+	} {
+		rec := do(h, http.MethodGet, path, nil)
+		if rec.Code != http.StatusOK || !strings.Contains(rec.Header().Get("Content-Type"), ct) {
+			t.Errorf("%s: %d %q", path, rec.Code, rec.Header().Get("Content-Type"))
 		}
 	}
-	for _, path := range []string{"/static/", "/static/css/", "/nope"} {
-		if rec := do(h, http.MethodGet, path, "", nil); rec.Code != http.StatusNotFound {
-			t.Errorf("%s: status %d, want 404", path, rec.Code)
+	if !strings.Contains(do(h, http.MethodGet, "/sw.js", nil).Header().Get("Content-Security-Policy"), "connect-src 'self'") {
+		t.Error("sw.js needs connect-src 'self'")
+	}
+	if !strings.HasPrefix(do(h, http.MethodGet, "/seedpoet-offline.html", nil).Header().Get("Content-Disposition"), "attachment") {
+		t.Error("offline file must download")
+	}
+	for _, path := range []string{"/../go.mod", "/go.mod", "/web.go", "/%2e%2e/go.mod"} {
+		if r := do(h, http.MethodGet, path, nil); r.Code == http.StatusOK {
+			t.Errorf("%s: served a file outside the site", path)
+		}
+	}
+	for path, code := range map[string]int{"/about.html": 301, "/index.html": 301, "/nope": 404, "/assets.json": 404} {
+		if r := do(h, http.MethodGet, path, nil); r.Code != code {
+			t.Errorf("%s: %d, want %d", path, r.Code, code)
 		}
 	}
 }

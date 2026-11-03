@@ -1,0 +1,87 @@
+{
+  "background_color": "#020a05",
+  "categories": [
+    "security",
+    "utilities",
+    "finance"
+  ],
+  "description": "Your BIP39 seed phrase as a rhyming poem, written on your device. Works offline.",
+  "dir": "ltr",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "icons": [
+    {
+      "purpose": "any",
+      "sizes": "192x192",
+      "src": "/icons/icon-192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "512x512",
+      "src": "/icons/icon-512.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "/icons/maskable-512.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "any",
+      "src": "/favicon.svg",
+      "type": "image/svg+xml"
+    }
+  ],
+  "id": "/",
+  "lang": "en",
+  "name": "Seed Poet",
+  "orientation": "any",
+  "scope": "/",
+  "screenshots": [
+    {
+      "form_factor": "wide",
+      "label": "Seed Poet home",
+      "sizes": "1280x720",
+      "src": "/screenshots/wide.png",
+      "type": "image/png"
+    },
+    {
+      "form_factor": "narrow",
+      "label": "Seed Poet on a phone",
+      "sizes": "412x915",
+      "src": "/screenshots/narrow.png",
+      "type": "image/png"
+    }
+  ],
+  "short_name": "Seed Poet",
+  "shortcuts": [
+    {
+      "icons": [
+        {
+          "sizes": "192x192",
+          "src": "/icons/icon-192.png"
+        }
+      ],
+      "name": "12-word poem",
+      "url": "/12"
+    },
+    {
+      "icons": [
+        {
+          "sizes": "192x192",
+          "src": "/icons/icon-192.png"
+        }
+      ],
+      "name": "24-word poem",
+      "url": "/24"
+    }
+  ],
+  "start_url": "/",
+  "theme_color": "#020a05"
+}

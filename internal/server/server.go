@@ -1,83 +1,76 @@
+// Package server serves the Seed Poet website for self-hosting (`seedpoet serve`)
+// and, behind nginx in production, the no-JavaScript fallback (POST /nojs/12|24).
+//
+// Normal visitors never ask the server for a poem: their browser writes it.
 package server
 
 import (
-	"encoding/json"
-	"html/template"
-	"io"
+	"bytes"
 	"io/fs"
 	"log"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
-	"github.com/abkvme/seed-poet/internal/generator"
+	"github.com/abkvme/seed-poet/seedpoet"
+	"github.com/abkvme/seed-poet/web"
 )
 
-// PoemTTL is how long a generated poem stays on the user's page.
-const PoemTTL = 15 * time.Minute
+// Page CSP: the page may not connect anywhere, so a poem cannot leave the device.
+const pageCSP = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; " +
+	"font-src 'self'; manifest-src 'self'; worker-src 'self'; connect-src 'none'; form-action 'self'; " +
+	"base-uri 'none'; frame-ancestors 'none'"
 
-// contentSecurityPolicy allows nothing but this origin's own CSS, JS and API.
-const contentSecurityPolicy = "default-src 'none'; script-src 'self'; style-src 'self'; " +
-	"img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'none'; " +
-	"frame-ancestors 'none'"
+// The service worker needs to fetch the site's own files to cache them.
+const workerCSP = "default-src 'none'; connect-src 'self'"
 
 type Server struct {
-	gen *generator.Generator
+	files    fs.FS
+	renderer *web.Renderer
 }
 
-type PoemPageData struct {
-	WordCount  int
-	Poem       string // only set for the no-JavaScript fallback (POST)
-	TTL        int
-	TTLMinutes int
+func New() (*Server, error) {
+	files, err := fs.Sub(web.Dist, "dist")
+	if err != nil {
+		return nil, err
+	}
+	assets, err := web.LoadAssets()
+	if err != nil {
+		return nil, err
+	}
+	r, err := web.NewRenderer(assets, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &Server{files: files, renderer: r}, nil
 }
 
-func New(gen *generator.Generator) *Server {
-	return &Server{gen: gen}
-}
-
-func (s *Server) SetupRoutes() http.Handler {
+func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
-
-	// Web routes
-	mux.HandleFunc("GET /{$}", s.handleLanding)
-	mux.HandleFunc("GET /12", s.handlePoemShell(12))
-	mux.HandleFunc("GET /24", s.handlePoemShell(24))
-	mux.HandleFunc("POST /12", s.handlePoemFallback(12))
-	mux.HandleFunc("POST /24", s.handlePoemFallback(24))
-	mux.HandleFunc("GET /expired", s.handleExpired)
-	mux.HandleFunc("GET /about", s.handleAbout)
-
-	// API: the only way the JavaScript page gets a poem.
-	mux.HandleFunc("POST /api/poem", s.handleAPIPoem)
-
-	// Static assets (CSS/JS), no directory listings.
-	sub, _ := fs.Sub(staticFS, "static")
-	files := http.StripPrefix("/static/", http.FileServerFS(sub))
-	mux.Handle("GET /static/css/{file}", files)
-	mux.Handle("GET /static/js/{file}", files)
-
-	// SEO routes
-	mux.HandleFunc("GET /robots.txt", s.handleStatic("static/robots.txt", "text/plain; charset=utf-8"))
-	mux.HandleFunc("GET /llms.txt", s.handleStatic("static/llms.txt", "text/plain; charset=utf-8"))
-	mux.HandleFunc("GET /llm.txt", s.handleStatic("static/llms.txt", "text/plain; charset=utf-8"))
-	mux.HandleFunc("GET /sitemap.xml", s.handleStatic("static/sitemap.xml", "application/xml; charset=utf-8"))
-
-	return securityHeaders(mux)
+	mux.HandleFunc("POST /nojs/{words}", s.handleNoJS)
+	mux.HandleFunc("GET /", s.handleStatic)
+	return headers(mux)
 }
 
-// securityHeaders applies to every response. Poem responses carry a seed phrase:
-// nothing may be cached by a browser or proxy, framed, indexed or leak a referrer.
-func securityHeaders(next http.Handler) http.Handler {
+func (s *Server) Run(addr string) error {
+	srv := &http.Server{
+		Addr:              addr,
+		Handler:           s.Handler(),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       60 * time.Second,
+		MaxHeaderBytes:    16 << 10,
+	}
+	log.Printf("Seed Poet v%s on http://%s", seedpoet.Version, addr)
+	return srv.ListenAndServe()
+}
+
+func headers(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h := w.Header()
-		if strings.HasPrefix(r.URL.Path, "/static/") {
-			h.Set("Cache-Control", "public, max-age=3600")
-		} else {
-			h.Set("Cache-Control", "no-store, max-age=0")
-			h.Set("Pragma", "no-cache")
-		}
-		h.Set("Content-Security-Policy", contentSecurityPolicy)
+		h.Set("Content-Security-Policy", pageCSP)
 		h.Set("Referrer-Policy", "no-referrer")
 		h.Set("X-Content-Type-Options", "nosniff")
 		h.Set("X-Frame-Options", "DENY")
@@ -89,134 +82,119 @@ func securityHeaders(next http.Handler) http.Handler {
 	})
 }
 
-func (s *Server) Run(addr string) error {
-	srv := &http.Server{
-		Addr:              addr,
-		Handler:           s.SetupRoutes(),
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      10 * time.Second,
-		IdleTimeout:       60 * time.Second,
-		MaxHeaderBytes:    16 << 10,
+// handleStatic serves web/dist with clean URLs (/12 -> 12.html) and a real 404.
+func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
+	p := path.Clean("/" + r.URL.Path)
+	name := strings.TrimPrefix(p, "/")
+	if name == "" {
+		name = "index.html"
 	}
-	log.Printf("Starting server on %s", addr)
-	return srv.ListenAndServe()
+	if strings.HasSuffix(p, ".html") && p != "/seedpoet-offline.html" {
+		// One canonical URL per page: /about, never /about.html (and / for /index.html).
+		to := strings.TrimSuffix(p, ".html")
+		if to == "/index" {
+			to = "/"
+		}
+		http.Redirect(w, r, to, http.StatusMovedPermanently)
+		return
+	}
+	if name == "assets.json" {
+		http.NotFound(w, r)
+		return
+	}
+	b, err := fs.ReadFile(s.files, name)
+	if err != nil {
+		if b2, err2 := fs.ReadFile(s.files, name+".html"); err2 == nil && !strings.Contains(name, ".") {
+			b, name = b2, name+".html"
+		} else {
+			s.notFound(w)
+			return
+		}
+	}
+	h := w.Header()
+	switch {
+	case strings.HasPrefix(name, "assets/"):
+		h.Set("Cache-Control", "public, max-age=31536000, immutable")
+	case name == "sw.js":
+		h.Set("Cache-Control", "no-cache")
+		h.Set("Content-Security-Policy", workerCSP)
+	case name == "seedpoet-offline.html":
+		h.Set("Content-Disposition", `attachment; filename="seedpoet-offline.html"`)
+		h.Set("Cache-Control", "no-cache")
+	case strings.HasSuffix(name, ".html"):
+		h.Set("Cache-Control", "no-cache")
+	default:
+		h.Set("Cache-Control", "public, max-age=86400")
+	}
+	switch name {
+	case "12.html", "24.html", "expired.html":
+		h.Set("X-Robots-Tag", "noindex, follow")
+	}
+	if ct := contentType(name); ct != "" {
+		h.Set("Content-Type", ct)
+	}
+	http.ServeContent(w, r, name, time.Time{}, bytes.NewReader(b))
 }
 
-func render(w http.ResponseWriter, t *template.Template, data any) {
+func contentType(name string) string {
+	switch path.Ext(name) {
+	case ".webmanifest":
+		return "application/manifest+json"
+	case ".txt":
+		return "text/plain; charset=utf-8"
+	case ".ico":
+		return "image/x-icon"
+	}
+	return ""
+}
+
+func (s *Server) notFound(w http.ResponseWriter) {
+	b, err := fs.ReadFile(s.files, "404.html")
+	if err != nil {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := t.Execute(w, data); err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Template error: %v", err)
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(http.StatusNotFound)
+	w.Write(b)
+}
+
+// handleNoJS writes a poem on the server for browsers without JavaScript. The
+// poem is not stored or logged; the page refreshes to /expired after 15 minutes.
+func (s *Server) handleNoJS(w http.ResponseWriter, r *http.Request) {
+	words := 0
+	switch r.PathValue("words") {
+	case "12":
+		words = 12
+	case "24":
+		words = 24
+	default:
+		s.notFound(w)
+		return
 	}
-}
-
-func pageData(wordCount int, poem string) PoemPageData {
-	return PoemPageData{
-		WordCount:  wordCount,
-		Poem:       poem,
-		TTL:        int(PoemTTL.Seconds()),
-		TTLMinutes: int(PoemTTL.Minutes()),
-	}
-}
-
-func (s *Server) handleLanding(w http.ResponseWriter, r *http.Request) {
-	render(w, landingTemplate, nil)
-}
-
-// handlePoemShell serves the poem page WITHOUT a poem. The page's script asks
-// /api/poem for one, so the seed never sits in a URL, in a cached document, or
-// in anything a crawler or link previewer can fetch with a GET.
-func (s *Server) handlePoemShell(wordCount int) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-Robots-Tag", "noindex, nofollow, noarchive")
-		render(w, poemTemplate, pageData(wordCount, ""))
-	}
-}
-
-// handlePoemFallback serves browsers without JavaScript: a POST from the
-// <noscript> form returns a page holding the poem that refreshes itself to
-// /expired after PoemTTL.
-func (s *Server) handlePoemFallback(wordCount int) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if !sameOrigin(r) {
-			http.Error(w, "Forbidden", http.StatusForbidden)
-			return
-		}
-		poem, err := s.gen.Generate(wordCount)
-		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			log.Printf("Generate error: %v", err)
-			return
-		}
-		w.Header().Set("X-Robots-Tag", "noindex, nofollow, noarchive")
-		render(w, poemTemplate, pageData(wordCount, poem.Format()))
-	}
-}
-
-type apiRequest struct {
-	Words int `json:"words"`
-}
-
-type apiResponse struct {
-	Lines []string `json:"lines"`
-	TTL   int      `json:"ttl"`
-}
-
-func (s *Server) handleAPIPoem(w http.ResponseWriter, r *http.Request) {
-	if !sameOrigin(r) || !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
+	switch r.Header.Get("Sec-Fetch-Site") {
+	case "", "same-origin", "none":
+	default:
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-	var req apiRequest
-	if err := json.NewDecoder(io.LimitReader(r.Body, 256)).Decode(&req); err != nil ||
-		(req.Words != 12 && req.Words != 24) {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
-	poem, err := s.gen.Generate(req.Words)
+	p, err := seedpoet.Generate(words)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Generate error: %v", err)
+		log.Printf("generate: %v", err)
 		return
 	}
-	lines := make([]string, len(poem.Lines))
-	for i, l := range poem.Lines {
-		lines[i] = strings.Join(l, " ")
+	var buf bytes.Buffer
+	if err := s.renderer.Render(&buf, web.NoJSPage(words, p.Lines)); err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("render: %v", err)
+		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Robots-Tag", "noindex, nofollow, noarchive")
-	json.NewEncoder(w).Encode(apiResponse{Lines: lines, TTL: int(PoemTTL.Seconds())})
-}
-
-// sameOrigin rejects requests that a browser marks as coming from another site.
-// Clients that send no Sec-Fetch-Site (curl, old browsers) are allowed: they can
-// only ever receive their own freshly generated poem.
-func sameOrigin(r *http.Request) bool {
-	switch r.Header.Get("Sec-Fetch-Site") {
-	case "", "same-origin", "none":
-		return true
-	}
-	return false
-}
-
-func (s *Server) handleExpired(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("X-Robots-Tag", "noindex, nofollow")
-	render(w, expiredTemplate, pageData(0, ""))
-}
-
-func (s *Server) handleAbout(w http.ResponseWriter, r *http.Request) {
-	render(w, aboutTemplate, nil)
-}
-
-func (s *Server) handleStatic(name, contentType string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := staticFS.ReadFile(name)
-		if err != nil {
-			http.NotFound(w, r)
-			return
-		}
-		w.Header().Set("Content-Type", contentType)
-		w.Write(data)
-	}
+	h := w.Header()
+	h.Set("Content-Type", "text/html; charset=utf-8")
+	h.Set("Cache-Control", "no-store, max-age=0")
+	h.Set("Pragma", "no-cache")
+	h.Set("X-Robots-Tag", "noindex, nofollow, noarchive")
+	w.Write(buf.Bytes())
 }

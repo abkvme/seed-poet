@@ -1,13 +1,13 @@
 package generator
 
 import (
-	crand "crypto/rand"
 	"errors"
-	"math/rand/v2"
+	"sort"
 	"strings"
 
 	"github.com/abkvme/seed-poet/internal/bip39"
 	"github.com/abkvme/seed-poet/internal/rhyme"
+	"github.com/abkvme/seed-poet/internal/rng"
 	"github.com/abkvme/seed-poet/internal/syllable"
 )
 
@@ -57,10 +57,14 @@ func New(verbs, adjectives, nouns []string, rhymeIndex *rhyme.Index) *Generator 
 		adjsBySyllable[s] = append(adjsBySyllable[s], a)
 	}
 
-	// Pre-compute all verb+adjective combinations by total syllable count
+	// Pre-compute all verb+adjective combinations by total syllable count.
+	// Syllable counts are walked in ascending order (never Go map order) so the
+	// pair lists are identical in Go and JavaScript.
 	comboBySyllable := make(map[int][]wordPair)
-	for vSyll, vList := range verbsBySyllable {
-		for aSyll, aList := range adjsBySyllable {
+	for _, vSyll := range sortedKeys(verbsBySyllable) {
+		vList := verbsBySyllable[vSyll]
+		for _, aSyll := range sortedKeys(adjsBySyllable) {
+			aList := adjsBySyllable[aSyll]
 			total := vSyll + aSyll
 			for _, v := range vList {
 				for _, a := range aList {
@@ -94,20 +98,18 @@ var ErrNoValidPoem = errors.New("generator: no valid BIP39 poem found")
 
 // Generate returns a poem whose words, read in order, form a valid BIP39
 // mnemonic (checksum included). Unsupported word counts fall back to 12.
-//
-// Randomness: each call seeds its own ChaCha8 generator from crypto/rand.
-// ChaCha8 is a cryptographically secure generator (see math/rand/v2 docs), so
-// every choice below is unpredictable, and no state is shared between calls.
-// Poems are drawn at random and rejected until the checksum holds, which keeps
-// the choice uniform among the valid poems the generator can produce.
+// All randomness comes from crypto/rand.
 func (g *Generator) Generate(wordCount int) (*Poem, error) {
-	var seed [32]byte
-	if _, err := crand.Read(seed[:]); err != nil {
-		return nil, err
-	}
-	r := rand.New(rand.NewChaCha8(seed))
-	clear(seed[:])
+	r := rng.Crypto()
+	defer r.Wipe()
+	return g.GenerateWith(r, wordCount)
+}
 
+// GenerateWith draws poems from r until one has a valid BIP39 checksum, which
+// keeps the choice uniform among the valid poems the generator can produce.
+// With rng.Deterministic it is reproducible and matches the JavaScript library
+// poem for poem (see testdata/vectors.json).
+func (g *Generator) GenerateWith(r *rng.RNG, wordCount int) (*Poem, error) {
 	if wordCount != 12 && wordCount != 24 {
 		wordCount = 12
 	}
@@ -120,7 +122,7 @@ func (g *Generator) Generate(wordCount int) (*Poem, error) {
 	return nil, ErrNoValidPoem
 }
 
-func (g *Generator) generateOnce(r *rand.Rand, wordCount int) *Poem {
+func (g *Generator) generateOnce(r *rng.RNG, wordCount int) *Poem {
 	var linesPerPoem, wordsPerLine, coupletCount int
 
 	switch wordCount {
@@ -188,7 +190,7 @@ func (g *Generator) generateOnce(r *rand.Rand, wordCount int) *Poem {
 }
 
 // buildLineWithSyllables builds a line: VERB + ADJECTIVE + NOUN
-func (g *Generator) buildLineWithSyllables(r *rand.Rand, noun string, wordCount int, used map[string]bool) ([]string, int) {
+func (g *Generator) buildLineWithSyllables(r *rng.RNG, noun string, wordCount int, used map[string]bool) ([]string, int) {
 	words := make([]string, wordCount)
 
 	// Position 3 (last): noun for rhyming
@@ -212,7 +214,7 @@ func (g *Generator) buildLineWithSyllables(r *rand.Rand, noun string, wordCount 
 }
 
 // buildLineMatchingSyllables builds a line matching target syllable count
-func (g *Generator) buildLineMatchingSyllables(r *rand.Rand, noun string, wordCount int, used map[string]bool, targetSyllables int) []string {
+func (g *Generator) buildLineMatchingSyllables(r *rng.RNG, noun string, wordCount int, used map[string]bool, targetSyllables int) []string {
 	words := make([]string, wordCount)
 
 	// Position 3: noun
@@ -233,7 +235,7 @@ func (g *Generator) buildLineMatchingSyllables(r *rand.Rand, noun string, wordCo
 	return words
 }
 
-func (g *Generator) pickVerbAndAdjForSyllables(r *rand.Rand, targetTotal int, used map[string]bool) (string, string) {
+func (g *Generator) pickVerbAndAdjForSyllables(r *rng.RNG, targetTotal int, used map[string]bool) (string, string) {
 	// Try exact match first, then close matches
 	for _, target := range []int{targetTotal, targetTotal - 1, targetTotal + 1} {
 		if pairs := g.comboBySyllable[target]; len(pairs) > 0 {
@@ -251,7 +253,7 @@ func (g *Generator) pickVerbAndAdjForSyllables(r *rand.Rand, targetTotal int, us
 	return g.pickUnusedFrom(r, g.verbs, used), g.pickUnusedFrom(r, g.adjectives, used)
 }
 
-func (g *Generator) pickTwoRhymingWithSimilarSyllables(r *rand.Rand, group []string, used map[string]bool) []string {
+func (g *Generator) pickTwoRhymingWithSimilarSyllables(r *rng.RNG, group []string, used map[string]bool) []string {
 	var available []string
 	for _, word := range group {
 		if !used[word] {
@@ -273,10 +275,10 @@ func (g *Generator) pickTwoRhymingWithSimilarSyllables(r *rand.Rand, group []str
 		bySyllables[syll] = append(bySyllables[syll], word)
 	}
 
-	// Collect syllable counts that have 2+ words
+	// Collect syllable counts that have 2+ words, in ascending order
 	var validCounts []int
-	for count, words := range bySyllables {
-		if len(words) >= 2 {
+	for _, count := range sortedKeys(bySyllables) {
+		if len(bySyllables[count]) >= 2 {
 			validCounts = append(validCounts, count)
 		}
 	}
@@ -293,7 +295,7 @@ func (g *Generator) pickTwoRhymingWithSimilarSyllables(r *rand.Rand, group []str
 	return available[:2]
 }
 
-func (g *Generator) pickUnusedFrom(r *rand.Rand, wordList []string, used map[string]bool) string {
+func (g *Generator) pickUnusedFrom(r *rng.RNG, wordList []string, used map[string]bool) string {
 	n := len(wordList)
 	// Try random index selection with retry (fast when few words are used)
 	for attempts := 0; attempts < 50; attempts++ {
@@ -311,7 +313,7 @@ func (g *Generator) pickUnusedFrom(r *rand.Rand, wordList []string, used map[str
 	return wordList[r.IntN(n)]
 }
 
-func (g *Generator) pickTwoFromGroup(r *rand.Rand, group []string) []string {
+func (g *Generator) pickTwoFromGroup(r *rng.RNG, group []string) []string {
 	if len(group) < 2 {
 		return group
 	}
@@ -320,6 +322,15 @@ func (g *Generator) pickTwoFromGroup(r *rand.Rand, group []string) []string {
 	copy(shuffled, group)
 	r.Shuffle(len(shuffled), func(i, j int) { shuffled[i], shuffled[j] = shuffled[j], shuffled[i] })
 	return []string{shuffled[0], shuffled[1]}
+}
+
+func sortedKeys[V any](m map[int]V) []int {
+	keys := make([]int, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	return keys
 }
 
 func (p *Poem) Format() string {

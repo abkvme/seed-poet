@@ -1,0 +1,25 @@
+# Seed Poet
+
+> Seed Poet generates a valid BIP39 seed phrase (12 or 24 words) written as rhyming couplets, so it is easier to remember. The poem is generated in the user's browser and never sent or stored.
+
+Seed Poet is free and open source (MIT), developed by OxiSoft (https://oxisoft.io).
+
+## Facts
+- Every poem, read word by word, is a valid BIP39 English mnemonic with a correct checksum; any BIP39 wallet accepts it.
+- Lines follow a VERB + ADJECTIVE + NOUN pattern; the nouns of each couplet rhyme and the lines have matching syllable counts.
+- 12 words = 4 lines (2 couplets); 24 words = 8 lines (4 couplets).
+- Randomness: crypto.getRandomValues in the browser (crypto/rand in Go).
+- Works with any wallet that imports a standard BIP39 English phrase: Bitcoin, Litecoin, Dogecoin, Bitcoin Cash, Ethereum and EVM networks (Polygon, BNB Chain, Arbitrum, Optimism, Base, Avalanche C-Chain), Solana, Cardano (24 words), Polkadot, Cosmos and Tron; wallets such as Ledger, Trezor, MetaMask, Trust Wallet, Phantom and Exodus. Not Monero (own 25-word format).
+- Strength estimate: about 88 bits for 12 words and 176 bits for 24 words (a fully random BIP39 phrase has 128 and 256), because rhyme and grammar limit word choice. 24 words are recommended for real value.
+- Privacy: the poem page may not make network requests (CSP connect-src 'none'); no cookies, analytics or third-party code; the poem is wiped after 15 minutes or when the page is left.
+- Without JavaScript, the server can generate a poem instead; it is shown once and never stored or logged.
+- Works offline, installs as an app (PWA), and has a single-file offline version.
+- Two identical implementations: Go (library + CLI) and dependency-free JavaScript; the same random bytes give the same poem.
+- Version 2.0.0.
+
+## Links
+- Website: https://seedpoet.com
+- About: https://seedpoet.com/about
+- Offline version: https://seedpoet.com/seedpoet-offline.html
+- Source code: https://github.com/abkvme/seed-poet
+- Developer: https://oxisoft.io

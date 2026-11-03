@@ -11,37 +11,40 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build Verification
+  go:
+    name: Go build and tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - name: Build
-        run: go build -v ./cmd/bip39poem
-
-  test:
-    name: Run Tests
-    needs: build
-    # Run tests on main, tags, or pull requests
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
+      - name: Formatting
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
       - name: Vet
         run: go vet ./...
+      - name: Website build is up to date
+        run: |
+          go run ./cmd/buildweb
+          git status --porcelain web/dist
+          test -z "$(git status --porcelain web/dist)" || (echo "web/dist is stale: run go run ./cmd/buildweb and commit" && exit 1)
       - name: Test
-        run: go test -race -v ./...
+        run: go test -race ./...
+
+  js:
+    name: JavaScript tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test (same poems as Go, BIP39 vectors)
+        run: node --test js/
 
   release:
     name: Create Release
-    needs: test
-    # Run only on version tags
+    needs: [go, js]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
@@ -51,19 +54,23 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - name: Build Binaries
+      - name: Build binaries and website package
         run: |
           export CGO_ENABLED=0
-          GOOS=linux GOARCH=amd64 go build -trimpath -o seedpoet-linux-amd64 ./cmd/bip39poem
-          GOOS=linux GOARCH=arm64 go build -trimpath -o seedpoet-linux-arm64 ./cmd/bip39poem
-          GOOS=darwin GOARCH=arm64 go build -trimpath -o seedpoet-darwin-arm64 ./cmd/bip39poem
-          GOOS=windows GOARCH=amd64 go build -trimpath -o seedpoet-windows-amd64.exe ./cmd/bip39poem
-          sha256sum seedpoet-* > SHA256SUMS
+          GOOS=linux GOARCH=amd64 go build -trimpath -o seedpoet-linux-amd64 ./cmd/seedpoet
+          GOOS=linux GOARCH=arm64 go build -trimpath -o seedpoet-linux-arm64 ./cmd/seedpoet
+          GOOS=darwin GOARCH=arm64 go build -trimpath -o seedpoet-darwin-arm64 ./cmd/seedpoet
+          GOOS=windows GOARCH=amd64 go build -trimpath -o seedpoet-windows-amd64.exe ./cmd/seedpoet
+          tar -C web/dist --sort=name --owner=0 --group=0 --numeric-owner --mtime='2026-01-01' -czf seedpoet-web.tar.gz .
+          cp web/dist/seedpoet-offline.html seedpoet-offline.html
+          cp js/seedpoet.js seedpoet.js
+          sha256sum seedpoet-* seedpoet.js > SHA256SUMS
       - name: Upload Assets
         uses: softprops/action-gh-release@v2
         with:
           files: |
             seedpoet-*
+            seedpoet.js
             SHA256SUMS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

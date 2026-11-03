@@ -1,0 +1,76 @@
+<!doctype html>
+<!-- Source of web/static/root/og.png (1200x630), rendered by web/tools/render_images.py -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative;
+    font-family: "JetBrains Mono", "DejaVu Sans Mono", "Liberation Mono", monospace;
+    color: #d9ffe9;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(0,255,156,.16), transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(45,226,255,.10), transparent 50%),
+      #020a05;
+  }
+  #rain { position: absolute; inset: 0; opacity: .20; font-size: 18px; line-height: 20px; color: #00ff9c; white-space: pre; letter-spacing: 6px; }
+  .scan { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px); }
+  .vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.7) 100%); }
+  .wrap { position: absolute; inset: 0; display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; align-items: center; padding: 56px 64px; }
+  .hud { font-size: 17px; letter-spacing: .22em; text-transform: uppercase; color: #2de2ff; }
+  .hud span { color: #3f6f55; }
+  h1 { position: relative; margin: 14px 0 6px; font-size: 108px; line-height: .92; font-weight: 800; letter-spacing: -2px; text-transform: uppercase; color: #00ff9c;
+       text-shadow: 0 0 8px rgba(0,255,156,.6), 0 0 34px rgba(0,255,156,.3), 4px 0 0 rgba(255,47,208,.55), -4px 0 0 rgba(45,226,255,.55); }
+  .tag { font-size: 38px; margin: 14px 0 24px; }
+  .tag em { font-style: normal; color: #ff2fd0; text-shadow: 0 0 14px rgba(255,47,208,.55); }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 19px; color: #7fb79a; }
+  .chips b { color: #00ff9c; }
+  .term { position: relative; background: rgba(3,20,11,.85); border: 2px solid rgba(0,255,156,.35);
+          clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); }
+  .bar { display: flex; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid rgba(0,255,156,.18); font-size: 15px; letter-spacing: .2em; color: #2de2ff; text-transform: uppercase; }
+  .lines { padding: 22px 22px 26px; font-size: 22px; line-height: 2.05; }
+  .lines div:nth-child(2n) { margin-bottom: 12px; }
+  .ln { display: inline-block; width: 46px; color: #3f6f55; }
+  .r { display: inline-block; height: 18px; vertical-align: middle; margin-right: 12px; background: linear-gradient(90deg, rgba(0,255,156,.45), rgba(0,255,156,.18)); }
+  .caret { display: inline-block; width: 14px; height: 24px; vertical-align: middle; background: #00ff9c; box-shadow: 0 0 10px #00ff9c; }
+  .foot { position: absolute; left: 64px; right: 64px; bottom: 30px; display: flex; justify-content: space-between; font-size: 22px; letter-spacing: .06em; }
+  .foot .url { color: #00ff9c; font-weight: 700; }
+  .foot .by { color: #7fb79a; }
+  .foot .by b { color: #d9ffe9; }
+  .icon { width: 58px; height: 58px; vertical-align: middle; margin-right: 14px; filter: drop-shadow(0 0 8px rgba(0,255,156,.6)); }
+</style>
+</head>
+<body>
+<div id="rain"></div>
+<div class="scan"></div>
+<div class="vig"></div>
+<div class="wrap">
+  <div>
+    <p class="hud"><img class="icon" src="../static/root/favicon.svg" alt="">BIP39 <span>//</span> rhyme engine</p>
+    <h1>Seed<br>Poet</h1>
+    <p class="tag">Your keys, <em>in verse</em></p>
+    <div class="chips"><span><b>&#9632;</b> Valid BIP39 seed</span><span><b>&#9632;</b> Rhyming couplets</span><span><b>&#9632;</b> Made in your browser</span><span><b>&#9632;</b> Gone in 15 min</span></div>
+  </div>
+  <div class="term">
+    <div class="bar"><span>seed.poet // 24 words</span><span>offline</span></div>
+    <div class="lines">
+      <div><span class="ln">01</span><span class="r" style="width:82px"></span><span class="r" style="width:104px"></span><span class="r" style="width:66px"></span></div>
+      <div><span class="ln">02</span><span class="r" style="width:66px"></span><span class="r" style="width:120px"></span><span class="r" style="width:66px"></span></div>
+      <div><span class="ln">03</span><span class="r" style="width:104px"></span><span class="r" style="width:66px"></span><span class="r" style="width:82px"></span></div>
+      <div><span class="ln">04</span><span class="r" style="width:82px"></span><span class="r" style="width:82px"></span><span class="r" style="width:82px"></span></div>
+      <div><span class="ln">05</span><span class="r" style="width:66px"></span><span class="r" style="width:104px"></span><span class="caret"></span></div>
+    </div>
+  </div>
+</div>
+<div class="foot"><span class="url">seedpoet.com</span><span class="by">free &amp; open source &middot; by <b>OxiSoft</b></span></div>
+<script>
+  // Static rain texture (deterministic, so the image is reproducible).
+  var g = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789', s = 7, out = '';
+  function rnd() { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; }
+  for (var y = 0; y < 32; y++) { var row = ''; for (var x = 0; x < 50; x++) row += rnd() < 0.35 ? g[Math.floor(rnd() * g.length)] : ' '; out += row + '\n'; }
+  document.getElementById('rain').textContent = out;
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "seed-poet",
+  "version": "2.0.0",
+  "description": "BIP39 seed phrases written as rhyming couplets. Zero-dependency JavaScript port of the Go library, identical output from the same random bytes.",
+  "main": "seedpoet.js",
+  "files": ["seedpoet.js"],
+  "scripts": { "test": "node --test" },
+  "engines": { "node": ">=19" },
+  "keywords": ["bip39", "mnemonic", "seed-phrase", "crypto-wallet", "poem", "rhyme", "bitcoin", "offline"],
+  "homepage": "https://seedpoet.com",
+  "repository": { "type": "git", "url": "git+https://github.com/abkvme/seed-poet.git", "directory": "js" },
+  "author": "OxiSoft (https://oxisoft.io)",
+  "license": "MIT"
+}

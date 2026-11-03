@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{template "head" .}}{{if .Poem}}<meta http-equiv="refresh" content="{{.TTL}};url=/expired">
+{{end}}</head>
+<body>
+{{template "header" .}}
+<main id="main">
+{{template "poem-section" .}}
+</main>
+{{template "footer" .}}
+{{template "poem-scripts" .}}</body>
+</html>

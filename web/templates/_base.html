@@ -1,0 +1,153 @@
+{{define "head"}}<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{.Title}}</title>
+<meta name="description" content="{{.Description}}">
+{{if .Canonical}}<link rel="canonical" href="{{.Canonical}}">
+{{end}}<meta name="robots" content="{{.Robots}}">
+<meta name="author" content="OxiSoft">
+<meta name="application-name" content="Seed Poet">
+<meta name="apple-mobile-web-app-title" content="Seed Poet">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#020a05">
+<meta name="color-scheme" content="dark">
+<meta name="format-detection" content="telephone=no">
+<meta name="referrer" content="no-referrer">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Seed Poet">
+<meta property="og:title" content="{{.OGTitle}}">
+<meta property="og:description" content="{{.OGDescription}}">
+<meta property="og:url" content="{{.URL}}">
+<meta property="og:image" content="{{.Site}}/og.png">
+<meta property="og:image:secure_url" content="{{.Site}}/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Seed Poet: your BIP39 seed phrase as a rhyming poem, generated in your browser">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{.OGTitle}}">
+<meta name="twitter:description" content="{{.OGDescription}}">
+<meta name="twitter:image" content="{{.Site}}/og.png">
+<meta name="twitter:image:alt" content="Seed Poet: your BIP39 seed phrase as a rhyming poem, generated in your browser">
+{{if .Offline}}<style>{{inlineCSS "css/site.css"}}</style>
+{{else}}<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="{{asset "css/site.css"}}" integrity="{{sri "css/site.css"}}">
+<link rel="author" href="/about">
+<link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
+{{end}}{{if .JSONLD}}<script type="application/ld+json">{{.JSONLD}}</script>
+{{end}}{{end}}
+
+{{define "header"}}<a class="skip" href="#main">Skip to content</a>
+<canvas id="rain" aria-hidden="true"></canvas>
+<header class="site-header">
+  <a class="brand" href="{{.Base}}/" aria-label="Seed Poet home">{{if .Offline}}<b>&#x2593;</b>{{else}}<img src="/favicon.svg" alt="" width="30" height="30">{{end}}<span>Seed<b>//</b>Poet</span></a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="{{.Base}}/12"{{if eq .Path "/12"}} aria-current="page"{{end}}>12 words</a>
+    <a href="{{.Base}}/24"{{if eq .Path "/24"}} aria-current="page"{{end}}>24 words</a>
+    <a href="{{.Base}}/about"{{if eq .Path "/about"}} aria-current="page"{{end}}>About</a>
+    <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>
+  </nav>
+</header>{{end}}
+
+{{define "footer"}}<footer class="site-footer">
+  <p class="credit">Developed by <a href="https://oxisoft.io" rel="noopener">OxiSoft</a></p>
+  <nav aria-label="Footer">
+    <a href="{{.Base}}/about#privacy">Privacy</a>
+    <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
+    {{if not .Offline}}<a href="/seedpoet-offline.html" download>Offline version</a>
+    {{end}}<span>v{{.Version}}</span>
+  </nav>
+</footer>{{end}}
+
+{{define "strength"}}<button class="strength-btn" type="button" popovertarget="strength-info">&#x26A0; How strong is a poem seed?</button>
+<div id="strength-info" class="popup" popover role="dialog" aria-labelledby="strength-title">
+  <h2 id="strength-title">How strong is a poem seed?</h2>
+  <p>A Seed Poet poem is a valid BIP39 phrase, but it is a little weaker than a fully random one. Rhymes, syllable counts and the verb, adjective, noun pattern limit which words can go where.</p>
+  <ul>
+    <li><strong>12 words:</strong> about 88 bits of randomness (fully random BIP39: 128 bits)</li>
+    <li><strong>24 words:</strong> about 176 bits (fully random BIP39: 256 bits)</li>
+  </ul>
+  <p>Even 88 bits is about 3 &times; 10<sup>26</sup> possible poems, far beyond any known brute-force attack, including one by someone who knows you used Seed Poet. These figures are our estimate.</p>
+  <p><strong>Our advice:</strong> for a wallet that holds real value, use 24 words, and for the highest safety use the <a href="{{.Base}}/seedpoet-offline.html" download>offline version</a> on a computer without internet.</p>
+  <button class="btn small" type="button" popovertarget="strength-info" popovertargetaction="hide">Got it</button>
+</div>{{end}}
+
+{{define "poem-scripts"}}{{if .Offline}}<script>{{inlineJS "js/data.js"}}</script>
+<script>{{inlineJS "js/seedpoet.js"}}</script>
+<script>{{inlineJS "js/pdf.js"}}</script>
+<script>{{inlineJS "js/app.js"}}</script>
+<script>{{inlineJS "js/site.js"}}</script>
+{{else}}<script src="{{asset "js/data.js"}}" integrity="{{sri "js/data.js"}}" defer></script>
+<script src="{{asset "js/seedpoet.js"}}" integrity="{{sri "js/seedpoet.js"}}" defer></script>
+<script src="{{asset "js/pdf.js"}}" integrity="{{sri "js/pdf.js"}}" defer></script>
+<script src="{{asset "js/app.js"}}" integrity="{{sri "js/app.js"}}" defer></script>
+<script src="{{asset "js/site.js"}}" integrity="{{sri "js/site.js"}}" defer></script>
+{{end}}{{end}}
+
+{{define "site-scripts"}}<script src="{{asset "js/site.js"}}" integrity="{{sri "js/site.js"}}" defer></script>{{end}}
+
+{{define "poem-section"}}<section class="poem-wrap" id="poem" data-words="{{.Words}}" data-ttl="{{.TTL}}"{{if .Poem}} data-static="1"{{else if .Offline}}{{else}} data-autostart="1" data-path="page"{{end}} aria-live="polite">
+  <div class="poem-head">
+    <div>
+      <p class="hud">Seed<span>.</span>Poet <span>//</span> BIP39 <span>//</span> {{if .Poem}}server{{else}}on-device{{end}}</p>
+      <h1 id="poem-title">{{if .Words}}{{.Words}}-word poem{{else}}Your poem{{end}}</h1>
+    </div>
+    <div class="timer" id="timer" hidden>
+      <span class="timer-note">Hidden automatically for your security</span>
+      <span class="timer-value" id="timer-value">{{.TTLMinutes}}:00</span>
+    </div>
+  </div>
+  <div class="poem-grid">
+  <div class="term">
+    <div class="term-body">
+      <ol class="poem-lines" id="poem-lines" translate="no">{{range $i, $l := .Poem}}<li><span class="ln">{{lineNo $i}}</span>{{index $l 0}} {{index $l 1}} <span class="rhyme">{{index $l 2}}</span></li>{{end}}</ol>
+      <p class="poem-status" id="poem-status" role="status"></p>
+      <div class="actions" id="actions"{{if not .Poem}} hidden{{end}}>
+        <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
+        <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
+        {{if .Poem}}<a class="btn small warn" id="hide-btn" href="/expired">I saved it, hide now</a>{{else}}<button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>{{end}}
+      </div>
+      <details class="numbered" id="numbered"{{if not .Poem}} hidden{{end}}>
+        <summary>Numbered words, in wallet order</summary>
+        <ol id="numbered-list" translate="no">{{range .Poem}}{{range .}}<li>{{.}}</li>{{end}}{{end}}</ol>
+      </details>
+      {{if not .Poem}}<noscript><div class="noscript-box" id="noscript-box">
+        <p>JavaScript is off, so this page cannot write a poem on your device. You can let our server write one instead: it is shown once, never stored or logged, and removed from the page after {{.TTLMinutes}} minutes.</p>
+        <form method="post" action="/nojs/{{if eq .Words 24}}24{{else}}12{{end}}"><button class="btn small ghost" type="submit">Generate on the server</button></form>
+      </div></noscript>{{end}}
+    </div>
+  </div>
+  {{template "chains" .}}
+  </div>
+  <p class="notice">{{if .Poem}}JavaScript is off, so our server wrote this poem. It was not stored or logged and cannot be shown again.{{else}}This poem is written by your browser and exists only on this page. Nothing is sent to any server.{{end}} Write it down on paper or print the PDF, then delete the PDF file. If you copy it, clear your clipboard.</p>
+  <div class="below">
+    <div class="cta">
+      {{if .Offline}}<a class="btn" href="#" data-generate="12">12 words</a>
+      <a class="btn" href="#" data-generate="24">24 words</a>{{else}}<a class="btn" href="/{{.Words}}" data-generate="{{.Words}}">New poem</a>
+      <a class="btn ghost" id="switch-btn" href="/{{.Other}}" data-generate="{{.Other}}">Switch to {{.Other}}</a>{{end}}
+    </div>
+    {{template "strength" .}}
+  </div>
+</section>{{end}}
+
+{{define "chains"}}<aside class="chains" aria-labelledby="chains-title">
+  <p class="hud" id="chains-title">Works with</p>
+  <ul>
+    <li><a href="{{.Base}}/about#blockchains"><b>BTC</b> Bitcoin</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>ETH</b> Ethereum</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>SOL</b> Solana</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>ADA</b> Cardano <i>24w</i></a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>EVM</b> Polygon, BNB, Base</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>DOT</b> Polkadot</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>ATOM</b> Cosmos</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>TRX</b> Tron</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>LTC</b> Litecoin</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>DOGE</b> Dogecoin</a></li>
+  </ul>
+  <p class="chains-note">Any BIP39 wallet: Ledger, Trezor, MetaMask, Phantom, Trust Wallet, Exodus</p>
+</aside>{{end}}

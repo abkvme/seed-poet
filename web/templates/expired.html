@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{template "head" .}}</head>
+<body>
+{{template "header" .}}
+<main id="main" class="prose center">
+  <p class="hud">Session <span>//</span> wiped</p>
+  <h1>Poem expired</h1>
+  <p>For your safety, a poem is removed from the page after {{.TTLMinutes}} minutes or when you hide it. It was never stored anywhere and cannot be recovered.</p>
+  <div class="cta">
+    <a class="btn" href="/12"><span class="k">12</span> words</a>
+    <a class="btn" href="/24"><span class="k">24</span> words</a>
+  </div>
+</main>
+{{template "footer" .}}
+{{template "site-scripts" .}}
+</body>
+</html>

@@ -1,10 +1,9 @@
 .git
-.gitignore
+.github
 scripts/
-data/
+js/test/
+web/tools/
 __pycache__/
 *.pyc
-seedpoet
-Makefile
-Dockerfile
+bin/
 .DS_Store

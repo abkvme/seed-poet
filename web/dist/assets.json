@@ -1,0 +1,26 @@
+{
+  "css/site.css": {
+    "path": "/assets/site.59a02ef349.css",
+    "sri": "sha384-CyhBL2T8+wX/KMghetl2+V/ZWrHpT3kA2F5Mco7wrHOWf0m7+Sl2UEKF8gAzXd5D"
+  },
+  "js/app.js": {
+    "path": "/assets/app.6186cf0fc4.js",
+    "sri": "sha384-ThE4Bb+DvxrxI6hYW4tJt0XKAhqPHxAzTS6MC9yGVlnHvb+GnpgUpNYmSEXIyoUp"
+  },
+  "js/data.js": {
+    "path": "/assets/data.6d82e27841.js",
+    "sri": "sha384-SQQ7/I8zl7JwAKFksVNkrOYKFH2NPL6Phqcht8LD5gRDdzns9giwsZO4/SkvUY59"
+  },
+  "js/pdf.js": {
+    "path": "/assets/pdf.3b53484cde.js",
+    "sri": "sha384-vQwK27xOJUP5WORLBFv1TXYoutKR1XSk6gRVWq3ChKA3i0uLHBThpVz2r0APhem/"
+  },
+  "js/seedpoet.js": {
+    "path": "/assets/seedpoet.7e9db08f38.js",
+    "sri": "sha384-HdozXWXva5XbpVzb61a7M0eYQf7hb4rQs8B1gS23VJe1LZYBVRZTfRGVjWFOCdSV"
+  },
+  "js/site.js": {
+    "path": "/assets/site.41c80ded3a.js",
+    "sri": "sha384-L3uNjfdKly2pd7GsI6yhw96WmZlcOi33tq1YGd2RbvvCCGmi3yHr3zRNbbIuyu9Z"
+  }
+}

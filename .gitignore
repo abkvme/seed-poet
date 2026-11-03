@@ -46,3 +46,6 @@ Thumbs.db
 # If you decide to ignore the generated Go files (optional, usually better to track them)
 # internal/wordlist/words.go
 # internal/rhyme/phonetic.go
+
+# Build output
+bin/

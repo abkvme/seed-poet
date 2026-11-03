@@ -4,6 +4,10 @@ Create phonetic rhyme groups for BIP39 words.
 Groups words by their actual pronunciation endings, not spelling.
 """
 
+import os
+
+import datafile
+
 # Phonetic rhyme groups - words that actually rhyme when spoken
 # Format: group_name -> list of BIP39 words that rhyme
 
@@ -442,7 +446,7 @@ PHONETIC_RHYME_GROUPS = {
 
 def main():
     # Read all BIP39 words
-    with open('../data/english.txt', 'r') as f:
+    with open(os.path.join(os.path.dirname(__file__), '..', 'data', 'english.txt')) as f:
         all_words = set(line.strip().lower() for line in f if line.strip())
 
     # Filter rhyme groups to only include BIP39 words
@@ -452,27 +456,13 @@ def main():
         if len(bip39_words) >= 2:  # Need at least 2 words to rhyme
             filtered_groups[group_name] = bip39_words
 
-    # Generate Go code
-    go_code = '''package rhyme
-
-// PhoneticGroups contains words grouped by their actual pronunciation endings.
-// Only BIP39 words are included, and only groups with 2+ words.
-var PhoneticGroups = map[string][]string{
-'''
-
-    for group_name, words in sorted(filtered_groups.items()):
-        go_code += f'\t"{group_name}": {{'
-        go_code += ', '.join(f'"{w}"' for w in sorted(words))
-        go_code += '},\n'
-
-    go_code += '}\n'
-
-    with open('../internal/rhyme/phonetic.go', 'w') as f:
-        f.write(go_code)
+    data = datafile.load()
+    data["rhymes"] = [[name, sorted(words)] for name, words in sorted(filtered_groups.items())]
+    datafile.save(data)
 
     # Stats
     total_words = sum(len(words) for words in filtered_groups.values())
-    print(f"Generated phonetic.go:")
+    print(f"Updated data/seedpoet.json:")
     print(f"  - {len(filtered_groups)} rhyme groups")
     print(f"  - {total_words} total word entries")
 

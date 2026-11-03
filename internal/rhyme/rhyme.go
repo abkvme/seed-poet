@@ -1,41 +1,33 @@
 package rhyme
 
-import "sort"
+import (
+	"sort"
+
+	"github.com/abkvme/seed-poet/data"
+)
 
 type Index struct {
 	Groups    map[string][]string
-	ValidKeys []string // Sorted by group size (largest first)
+	ValidKeys []string // largest group first, ties by key (same order in the JS library)
 }
 
-// BuildPhoneticIndex creates a rhyme index from pre-computed phonetic groups.
-// Keys are sorted by group size (largest first) for better variety.
+// BuildPhoneticIndex creates a rhyme index from the rhyme groups in data/seedpoet.json.
+// Only groups with 2+ words are used. The key order is fully deterministic so that
+// the Go and JavaScript generators consume randomness identically.
 func BuildPhoneticIndex() *Index {
-	type keySize struct {
-		key  string
-		size int
-	}
-
-	var keySizes []keySize
-	for key, words := range PhoneticGroups {
-		if len(words) >= 2 {
-			keySizes = append(keySizes, keySize{key, len(words)})
+	groups := make(map[string][]string, len(data.Rhymes))
+	var keys []string
+	for _, g := range data.Rhymes {
+		groups[g.Key] = g.Words
+		if len(g.Words) >= 2 {
+			keys = append(keys, g.Key)
 		}
 	}
-
-	// Sort by size descending - larger groups first for more variety
-	sort.Slice(keySizes, func(i, j int) bool {
-		return keySizes[i].size > keySizes[j].size
+	sort.Strings(keys)
+	sort.SliceStable(keys, func(i, j int) bool {
+		return len(groups[keys[i]]) > len(groups[keys[j]])
 	})
-
-	validKeys := make([]string, len(keySizes))
-	for i, ks := range keySizes {
-		validKeys[i] = ks.key
-	}
-
-	return &Index{
-		Groups:    PhoneticGroups,
-		ValidKeys: validKeys,
-	}
+	return &Index{Groups: groups, ValidKeys: keys}
 }
 
 func (idx *Index) GetGroup(key string) []string {
