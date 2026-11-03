@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abkvme/seed-poet/seedpoet"
+	"github.com/abkvme/seed-poet/v2/seedpoet"
 )
 
 func handler(t *testing.T) http.Handler {

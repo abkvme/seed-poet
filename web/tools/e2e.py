@@ -42,10 +42,18 @@ def wait_poem(page, n):
     return poem_words(page)
 
 
+def test_ua(b):
+    """The browser's own user agent plus a marker, so seedpoet.com's visit counter skips test runs."""
+    pg = b.new_page()
+    ua = pg.evaluate("navigator.userAgent")
+    pg.close()
+    return ua + " SeedPoetE2E"
+
+
 def browser_suite(bt, tmp):
     name = bt.name
     b = bt.launch()
-    ctx = b.new_context(accept_downloads=True)
+    ctx = b.new_context(accept_downloads=True, user_agent=test_ua(b))
     ctx.add_init_script(CLOCK)
     page = ctx.new_page()
     errors, foreign = [], []
@@ -156,7 +164,7 @@ def browser_suite(bt, tmp):
     ctx.close()
 
     # Without JavaScript: server fallback.
-    ctx = b.new_context(java_script_enabled=False)
+    ctx = b.new_context(java_script_enabled=False, user_agent=test_ua(b))
     page = ctx.new_page()
     page.goto(f"{BASE}/")
     check(poem_words(page) == [], f"{name} noJS: GET page has no poem")
@@ -172,7 +180,7 @@ def browser_suite(bt, tmp):
 
 def chromium_extras(p, tmp):
     b = p.chromium.launch()
-    ctx = b.new_context(accept_downloads=True)
+    ctx = b.new_context(accept_downloads=True, user_agent=test_ua(b))
     page = ctx.new_page()
 
     # Offline single file, opened from disk.

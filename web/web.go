@@ -13,7 +13,7 @@ import (
 	"io/fs"
 	"strings"
 
-	"github.com/abkvme/seed-poet/seedpoet"
+	"github.com/abkvme/seed-poet/v2/seedpoet"
 )
 
 //go:embed templates/*.html

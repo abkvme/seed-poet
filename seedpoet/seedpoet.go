@@ -14,16 +14,16 @@ package seedpoet
 import (
 	"sync"
 
-	"github.com/abkvme/seed-poet/internal/bip39"
-	"github.com/abkvme/seed-poet/internal/generator"
-	"github.com/abkvme/seed-poet/internal/rhyme"
-	"github.com/abkvme/seed-poet/internal/rng"
-	"github.com/abkvme/seed-poet/internal/wordlist"
+	"github.com/abkvme/seed-poet/v2/internal/bip39"
+	"github.com/abkvme/seed-poet/v2/internal/generator"
+	"github.com/abkvme/seed-poet/v2/internal/rhyme"
+	"github.com/abkvme/seed-poet/v2/internal/rng"
+	"github.com/abkvme/seed-poet/v2/internal/wordlist"
 )
 
 // Version of Seed Poet (Go library, CLI, website). The JavaScript library
 // (js/package.json) carries the same number; a test keeps them equal.
-const Version = "2.1.0"
+const Version = "2.1.1"
 
 // Poem is a generated poem: Lines of three words (verb, adjective, rhyming noun).
 type Poem = generator.Poem

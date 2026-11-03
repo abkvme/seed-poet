@@ -5,10 +5,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/abkvme/seed-poet/internal/bip39"
-	"github.com/abkvme/seed-poet/internal/rhyme"
-	"github.com/abkvme/seed-poet/internal/rng"
-	"github.com/abkvme/seed-poet/internal/syllable"
+	"github.com/abkvme/seed-poet/v2/internal/bip39"
+	"github.com/abkvme/seed-poet/v2/internal/rhyme"
+	"github.com/abkvme/seed-poet/v2/internal/rng"
+	"github.com/abkvme/seed-poet/v2/internal/syllable"
 )
 
 // wordPair holds a pre-computed verb+adjective combination

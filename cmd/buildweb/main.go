@@ -22,9 +22,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/abkvme/seed-poet/data"
-	"github.com/abkvme/seed-poet/seedpoet"
-	"github.com/abkvme/seed-poet/web"
+	"github.com/abkvme/seed-poet/v2/data"
+	"github.com/abkvme/seed-poet/v2/seedpoet"
+	"github.com/abkvme/seed-poet/v2/web"
 )
 
 const dist = "web/dist"
@@ -144,7 +144,7 @@ func manifest() []byte {
 		"name":             "Seed Poet",
 		"short_name":       "Seed Poet",
 		"description":      "Your BIP39 seed phrase as a rhyming poem, written on your device. Works offline.",
-		"start_url":        "/",
+		"start_url":        "/?source=pwa",
 		"scope":            "/",
 		"display":          "standalone",
 		"display_override": []string{"standalone", "minimal-ui"},

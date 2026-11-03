@@ -6,7 +6,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	"github.com/abkvme/seed-poet/internal/wordlist"
+	"github.com/abkvme/seed-poet/v2/internal/wordlist"
 )
 
 var index = func() map[string]int {

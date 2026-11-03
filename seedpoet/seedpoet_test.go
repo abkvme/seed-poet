@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abkvme/seed-poet/internal/rng"
+	"github.com/abkvme/seed-poet/v2/internal/rng"
 )
 
 var update = flag.Bool("update", false, "rewrite ../testdata/vectors.json")

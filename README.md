@@ -1,7 +1,7 @@
 # Seed Poet: BIP39 seed phrase generator that writes your wallet key as a rhyming poem
 
 [![CI](https://github.com/abkvme/seed-poet/actions/workflows/pipeline.yml/badge.svg)](https://github.com/abkvme/seed-poet/actions/workflows/pipeline.yml)
-[![Release](https://img.shields.io/github/v/release/abkvme/seed-poet)](https://github.com/abkvme/seed-poet/releases)
+[![Release](https://img.shields.io/github/v/release/abkvme/seed-poet)](https://github.com/abkvme/seed-poet/releases) [![Go Reference](https://pkg.go.dev/badge/github.com/abkvme/seed-poet/v2.svg)](https://pkg.go.dev/github.com/abkvme/seed-poet/v2/seedpoet)
 [![License: MIT](https://img.shields.io/badge/license-MIT-00ff9c.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/try%20it-seedpoet.com-00ff9c)](https://seedpoet.com)
 
@@ -75,7 +75,7 @@ as an app.
 ### Command line (Go)
 
 ```bash
-go install github.com/abkvme/seed-poet/cmd/seedpoet@latest
+go install github.com/abkvme/seed-poet/v2/cmd/seedpoet@latest
 seedpoet 24
 ```
 
@@ -85,7 +85,7 @@ Or download a binary for Linux, macOS or Windows from [Releases](https://github.
 ### Go library
 
 ```go
-import "github.com/abkvme/seed-poet/seedpoet"
+import "github.com/abkvme/seed-poet/v2/seedpoet"
 
 poem, err := seedpoet.Generate(24) // crypto/rand
 if err != nil { ... }

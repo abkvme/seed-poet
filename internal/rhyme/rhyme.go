@@ -3,7 +3,7 @@ package rhyme
 import (
 	"sort"
 
-	"github.com/abkvme/seed-poet/data"
+	"github.com/abkvme/seed-poet/v2/data"
 )
 
 type Index struct {

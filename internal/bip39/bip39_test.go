@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abkvme/seed-poet/internal/wordlist"
+	"github.com/abkvme/seed-poet/v2/internal/wordlist"
 )
 
 func TestWordlistMatchesOfficialFile(t *testing.T) {

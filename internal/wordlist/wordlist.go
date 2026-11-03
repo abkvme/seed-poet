@@ -2,7 +2,7 @@
 // loaded from data/seedpoet.json.
 package wordlist
 
-import "github.com/abkvme/seed-poet/data"
+import "github.com/abkvme/seed-poet/v2/data"
 
 var (
 	// BIP39Words contains all 2048 BIP39 English mnemonic words, in order.

@@ -4,9 +4,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/abkvme/seed-poet/internal/bip39"
-	"github.com/abkvme/seed-poet/internal/rhyme"
-	"github.com/abkvme/seed-poet/internal/wordlist"
+	"github.com/abkvme/seed-poet/v2/internal/bip39"
+	"github.com/abkvme/seed-poet/v2/internal/rhyme"
+	"github.com/abkvme/seed-poet/v2/internal/wordlist"
 )
 
 func newGen() *Generator {

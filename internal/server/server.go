@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abkvme/seed-poet/seedpoet"
-	"github.com/abkvme/seed-poet/web"
+	"github.com/abkvme/seed-poet/v2/seedpoet"
+	"github.com/abkvme/seed-poet/v2/web"
 )
 
 // Page CSP: the page may not connect anywhere, so a poem cannot leave the device.

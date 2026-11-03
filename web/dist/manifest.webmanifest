@@ -82,6 +82,6 @@
       "url": "/?words=24"
     }
   ],
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "theme_color": "#020a05"
 }

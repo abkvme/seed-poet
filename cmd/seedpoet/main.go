@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/abkvme/seed-poet/internal/server"
-	"github.com/abkvme/seed-poet/seedpoet"
+	"github.com/abkvme/seed-poet/v2/internal/server"
+	"github.com/abkvme/seed-poet/v2/seedpoet"
 )
 
 func main() {
