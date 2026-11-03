@@ -10,6 +10,7 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var lines = $('poem-lines');
+  var placeholder = $('placeholder');
   var numbered = $('numbered');
   var numberedList = $('numbered-list');
   var status = $('poem-status');
@@ -19,7 +20,8 @@
   var copyBtn = $('copy-btn');
   var pdfBtn = $('pdf-btn');
   var hideBtn = $('hide-btn');
-  var title = $('poem-title');
+  var wordsLabel = $('words-label');
+  var pickers = document.querySelectorAll('[data-generate]');
 
   var ttl = parseInt(box.getAttribute('data-ttl'), 10) || 900;
   var words = box.getAttribute('data-words') === '24' ? 24 : 12;
@@ -35,6 +37,12 @@
   function setStatus(msg, bad) {
     status.textContent = msg;
     status.className = bad ? 'poem-status expired' : 'poem-status';
+  }
+
+  function markPicker() {
+    Array.prototype.forEach.call(pickers, function (b) {
+      b.setAttribute('aria-pressed', current && b.getAttribute('data-generate') === String(words) ? 'true' : 'false');
+    });
   }
 
   function render(poemLines) {
@@ -66,12 +74,14 @@
     if (ticker) { clearInterval(ticker); ticker = 0; }
     clear(lines);
     clear(numberedList);
+    if (placeholder) placeholder.hidden = false;
     numbered.hidden = true;
     numbered.open = false;
     timer.hidden = true;
     actions.hidden = true;
     hideBtn.classList.remove('attention');
     hideBtn.textContent = 'I saved it, hide now';
+    markPicker();
     setStatus(message, true);
   }
 
@@ -90,22 +100,29 @@
   function show(poemLines) {
     current = poemLines;
     render(poemLines);
+    if (placeholder) placeholder.hidden = true;
+    wordsLabel.textContent = String(words);
     expiresAt = Date.now() + ttl * 1000;
     timer.hidden = false;
     actions.hidden = false;
     numbered.hidden = false;
     pdfBtn.hidden = !window.SeedPoetPDF;
     copyBtn.hidden = !(navigator.clipboard && navigator.clipboard.writeText);
+    hideBtn.classList.remove('attention');
+    hideBtn.textContent = 'I saved it, hide now';
+    markPicker();
     setStatus('Generated on this device. Nothing was sent or stored.', false);
     tick();
     if (ticker) clearInterval(ticker);
     ticker = setInterval(tick, 1000);
+    // Narrow screens stack the poem under the controls: bring it into view.
+    if (window.matchMedia && window.matchMedia('(max-width: 860px)').matches) {
+      box.querySelector('.out').scrollIntoView({ block: 'start' });
+    }
   }
 
   function generate(n) {
     words = n === 24 ? 24 : 12;
-    box.setAttribute('data-words', String(words));
-    if (title) title.textContent = words + '-word poem';
     try {
       if (!gen) gen = window.SeedPoet.createGenerator(window.SeedPoetData);
       var poem = gen.generate(words);
@@ -162,27 +179,14 @@
     nudge('PDF saved');
   });
 
-  // "New poem" / "12 words" / "24 words" generate in place; the links still work without JS.
-  Array.prototype.forEach.call(document.querySelectorAll('[data-generate]'), function (el) {
+  // The 12 / 24 buttons submit to the server only without JavaScript; here they
+  // generate on this device instead.
+  Array.prototype.forEach.call(pickers, function (el) {
     el.addEventListener('click', function (e) {
       e.preventDefault();
-      var n = parseInt(el.getAttribute('data-generate'), 10);
-      if (box.getAttribute('data-path') === 'page' && history.replaceState) {
-        history.replaceState(null, '', '/' + n);
-      }
-      generate(n);
-      var other = $('switch-btn');
-      if (other) {
-        var to = n === 24 ? 12 : 24;
-        other.setAttribute('data-generate', String(to));
-        other.setAttribute('href', '/' + to);
-        other.textContent = 'Switch to ' + to;
-      }
+      generate(parseInt(el.getAttribute('data-generate'), 10));
     });
   });
-
-  var noscript = $('noscript-box');
-  if (noscript) noscript.hidden = true;
 
   if (box.getAttribute('data-static') === '1') {
     // Server-rendered poem (no-JavaScript fallback page): take over the timer.
@@ -191,9 +195,13 @@
       server.push(li.textContent.replace(/^\d+/, '').trim().split(/\s+/));
     });
     if (server.length) show(server);
-  } else if (box.getAttribute('data-autostart') === '1') {
-    generate(words);
-  } else {
-    setStatus('Choose 12 or 24 words. The poem is generated on this device.', false);
+    return;
+  }
+
+  // App shortcuts and old links (/12, /24 redirect here as /?words=N) start a poem at once.
+  var asked = /[?&]words=(12|24)\b/.exec(location.search);
+  if (asked) {
+    if (history.replaceState) history.replaceState(null, '', location.pathname);
+    generate(parseInt(asked[1], 10));
   }
 })();

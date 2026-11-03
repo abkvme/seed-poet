@@ -250,27 +250,11 @@ func aboutLD() template.JS {
 	})
 }
 
-// Pages lists every static page of the site.
+// Pages lists every static page of the site. The generator is one page: "/".
 func Pages() []Page {
-	noindex := "noindex, follow"
-	poem := func(n int) Page {
-		other := 24
-		if n == 24 {
-			other = 12
-		}
-		return base(Page{
-			Template: "poem.html", File: fmt.Sprintf("%d.html", n), Path: fmt.Sprintf("/%d", n),
-			Title:       fmt.Sprintf("%d-Word Rhyming Seed Phrase | Seed Poet", n),
-			Description: fmt.Sprintf("Your %d-word BIP39 seed phrase as a rhyming poem, generated in your browser. Never sent or stored, hidden after 15 minutes.", n),
-			OGTitle:     ogTitle, OGDescription: ogDesc,
-			Robots: noindex, Canonical: Site + fmt.Sprintf("/%d", n), Words: n, Other: other,
-		})
-	}
 	return []Page{
 		base(Page{Template: "index.html", File: "index.html", Path: "/", Title: homeTitle, Description: homeDesc,
 			OGTitle: ogTitle, OGDescription: ogDesc, Canonical: Site + "/", JSONLD: homeLD(), InSitemap: true}),
-		poem(12),
-		poem(24),
 		base(Page{Template: "about.html", File: "about.html", Path: "/about",
 			Title:       "About Seed Poet: How Rhyming BIP39 Seed Phrases Work",
 			Description: "How Seed Poet writes a BIP39 seed phrase as a rhyming poem, which blockchains and wallets accept it, how strong it is, and how it keeps it private.",
@@ -286,18 +270,14 @@ func Pages() []Page {
 			Title:       "Seed Poet offline",
 			Description: "Seed Poet in one file: generate a rhyming BIP39 seed phrase on a computer without internet.",
 			OGTitle:     ogTitle, OGDescription: ogDesc, Robots: "noindex, nofollow",
-			Offline: true, Base: Site, Words: 0}),
+			Offline: true, Base: Site}),
 	}
 }
 
 // NoJSPage is the server-rendered poem page for browsers without JavaScript.
 func NoJSPage(words int, lines [][]string) Page {
-	for _, p := range Pages() {
-		if p.Words == words && p.Template == "poem.html" {
-			p.Poem = lines
-			p.Robots = "noindex, nofollow, noarchive"
-			return p
-		}
-	}
-	panic("no poem page")
+	return base(Page{Template: "poem.html", Path: fmt.Sprintf("/nojs/%d", words),
+		Title:       fmt.Sprintf("%d-word poem | Seed Poet", words),
+		Description: homeDesc, OGTitle: ogTitle, OGDescription: ogDesc,
+		Robots: "noindex, nofollow, noarchive", Words: words, Poem: lines})
 }

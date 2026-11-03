@@ -1,8 +1,6 @@
 # Seed Poet: https://seedpoet.com
 User-agent: *
 Allow: /
-Disallow: /12
-Disallow: /24
 Disallow: /nojs/
 Disallow: /expired
 

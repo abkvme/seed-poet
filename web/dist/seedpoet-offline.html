@@ -288,13 +288,13 @@ main {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: clamp(0.95rem, 2.6vw, 1.15rem);
-  line-height: 2;
+  font-size: clamp(0.92rem, 3.4vw, 1rem);
+  line-height: 1.75;
   color: var(--green-2);
 }
 
 .preview-lines li:nth-child(2n) {
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.55rem;
 }
 
 .preview-lines .ln,
@@ -484,7 +484,7 @@ main {
 }
 
 .timer-value {
-  font-size: clamp(1.4rem, 5vw, 1.9rem);
+  font-size: 1.15rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
@@ -510,14 +510,14 @@ main {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: clamp(1.05rem, 4.4vw, 1.55rem);
-  line-height: 1.9;
+  font-size: clamp(0.92rem, 3.4vw, 1rem);
+  line-height: 1.75;
   color: var(--ink);
   overflow-wrap: anywhere;
 }
 
 .poem-lines li:nth-child(2n) {
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.55rem;
 }
 
 .poem-lines li:last-child {
@@ -690,6 +690,167 @@ main > .chains ul {
 
 main > .chains a {
   padding: 0.4rem 0.75rem;
+}
+
+/* ---------- Generator: one page, fits one desktop screen ---------- */
+.one-screen main {
+  display: flex;
+  align-items: center;
+  padding-top: clamp(0.6rem, 2.5vh, 2.2rem);
+  padding-bottom: clamp(0.6rem, 2.5vh, 2.2rem);
+}
+
+.one-screen .site-header {
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+
+.out .poem-lines,
+.out .preview-lines {
+  line-height: 1.6;
+}
+
+.out .poem-lines li:nth-child(2n),
+.out .preview-lines li:nth-child(2n) {
+  margin-bottom: 0.45rem;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(1.5rem, 4vw, 3.2rem);
+  align-items: start;
+  width: 100%;
+}
+
+.app .title {
+  margin: 0.3rem 0 0;
+  font-size: clamp(2.2rem, 5.5vw, 3.2rem);
+}
+
+.app .tagline {
+  margin: 0.2rem 0 0.7rem;
+  font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+}
+
+.app .lede {
+  margin: 0 0 1.1rem;
+  font-size: 0.92rem;
+}
+
+.pick {
+  display: flex;
+  gap: 0.7rem;
+  margin: 0 0 0.9rem;
+}
+
+.pick .btn {
+  flex: 1;
+}
+
+.pick .btn[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--green);
+}
+
+.side-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+}
+
+.chains-title {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+.app .chains ul {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.app .chains a {
+  gap: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.74rem;
+}
+
+.app .chains b {
+  min-width: 0;
+}
+
+.app .chains i {
+  margin-left: 0.3rem;
+}
+
+.app .chains-note {
+  margin-top: 0.5rem;
+}
+
+.out .term-body {
+  padding: 0.9rem 1.2rem 1rem;
+}
+
+.out .term-bar {
+  min-height: 3rem;
+  padding: 0.45rem 1rem;
+}
+
+.out .timer-note {
+  font-size: 0.6rem;
+}
+
+.out .poem-status {
+  font-size: 0.82rem;
+}
+
+.out .actions {
+  margin-top: 0.8rem;
+  gap: 0.5rem;
+}
+
+.out .btn.small {
+  min-height: 36px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.72rem;
+}
+
+.out .numbered {
+  margin-top: 0.8rem;
+  padding-top: 0.6rem;
+}
+
+.out .numbered ol {
+  font-size: 0.85rem;
+}
+
+.out .notice {
+  margin-top: 0.55rem;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.one-screen .site-footer {
+  padding-top: 0.6rem;
+  padding-bottom: 0.7rem;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 860px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .one-screen main {
+    display: block;
+  }
 }
 
 /* ---------- Text pages ---------- */
@@ -875,73 +1036,28 @@ main > .chains a {
 }
 </style>
 </head>
-<body>
+<body class="one-screen">
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <a class="brand" href="https://seedpoet.com/"><b>&#x2593;</b><span>Seed<b>//</b>Poet</span></a>
   <nav class="site-nav" aria-label="Main">
-    <a href="https://seedpoet.com/12">12 words</a>
-    <a href="https://seedpoet.com/24">24 words</a>
+    <a href="https://seedpoet.com/">Generator</a>
     <a href="https://seedpoet.com/about">About</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>
   </nav>
 </header>
 <main id="main">
-<section class="poem-wrap" id="poem" data-words="0" data-ttl="900" aria-live="polite">
-  <div class="poem-head">
-    <div>
-      <p class="hud">Seed<span>.</span>Poet <span>//</span> BIP39 <span>//</span> on-device</p>
-      <h1 id="poem-title">Your poem</h1>
-    </div>
-    <div class="timer" id="timer" hidden>
-      <span class="timer-note">Hidden automatically for your security</span>
-      <span class="timer-value" id="timer-value">15:00</span>
-    </div>
-  </div>
-  <div class="poem-grid">
-  <div class="term">
-    <div class="term-body">
-      <ol class="poem-lines" id="poem-lines" translate="no"></ol>
-      <p class="poem-status" id="poem-status" role="status"></p>
-      <div class="actions" id="actions" hidden>
-        <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
-        <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
-        <button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>
-      </div>
-      <details class="numbered" id="numbered" hidden>
-        <summary>Numbered words, in wallet order</summary>
-        <ol id="numbered-list" translate="no"></ol>
-      </details>
-      <noscript><div class="noscript-box" id="noscript-box">
-        <p>JavaScript is off, so this page cannot write a poem on your device. You can let our server write one instead: it is shown once, never stored or logged, and removed from the page after 15 minutes.</p>
-        <form method="post" action="/nojs/12"><button class="btn small ghost" type="submit">Generate on the server</button></form>
-      </div></noscript>
-    </div>
-  </div>
-  <aside class="chains" aria-labelledby="chains-title">
-  <p class="hud" id="chains-title">Works with</p>
-  <ul>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>BTC</b> Bitcoin</a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>ETH</b> Ethereum</a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>SOL</b> Solana</a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>ADA</b> Cardano <i>24w</i></a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>EVM</b> Polygon, BNB, Base</a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>DOT</b> Polkadot</a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>ATOM</b> Cosmos</a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>TRX</b> Tron</a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>LTC</b> Litecoin</a></li>
-    <li><a href="https://seedpoet.com/about#blockchains"><b>DOGE</b> Dogecoin</a></li>
-  </ul>
-  <p class="chains-note">Any BIP39 wallet: Ledger, Trezor, MetaMask, Phantom, Trust Wallet, Exodus</p>
-</aside>
-  </div>
-  <p class="notice">This poem is written by your browser and exists only on this page. Nothing is sent to any server. Write it down on paper or print the PDF, then delete the PDF file. If you copy it, clear your clipboard.</p>
-  <div class="below">
-    <div class="cta">
-      <a class="btn" href="#" data-generate="12">12 words</a>
-      <a class="btn" href="#" data-generate="24">24 words</a>
-    </div>
-    <button class="strength-btn" type="button" popovertarget="strength-info">&#x26A0; How strong is a poem seed?</button>
+<section class="app" id="poem" data-words="12" data-ttl="900">
+  <div class="side">
+    <p class="hud">BIP39 <span>//</span> rhyme engine <span>//</span> in your browser</p>
+    <h1 class="title">Seed Poet</h1>
+    <p class="tagline">Your keys, <em>in verse</em></p>
+    <p class="lede">Generate memorable poems using BIP39 mnemonic words. Each poem is a valid seed phrase for Bitcoin, Ethereum, Solana, Cardano and any other <a href="https://seedpoet.com/about#blockchains">BIP39 wallet</a>.</p>
+    <form class="pick" method="post" action="/nojs/12" aria-label="Poem length">
+      <button class="btn" type="submit" formaction="/nojs/12" data-generate="12"><span class="k">12</span> words</button>
+      <button class="btn" type="submit" formaction="/nojs/24" data-generate="24"><span class="k">24</span> words</button>
+    </form>
+    <div class="side-links"><button class="strength-btn" type="button" popovertarget="strength-info">&#x26A0; How strong is a poem seed?</button>
 <div id="strength-info" class="popup" popover role="dialog" aria-labelledby="strength-title">
   <h2 id="strength-title">How strong is a poem seed?</h2>
   <p>A Seed Poet poem is a valid BIP39 phrase, but it is a little weaker than a fully random one. Rhymes, syllable counts and the verb, adjective, noun pattern limit which words can go where.</p>
@@ -952,7 +1068,52 @@ main > .chains a {
   <p>Even 88 bits is about 3 &times; 10<sup>26</sup> possible poems, far beyond any known brute-force attack, including one by someone who knows you used Seed Poet. These figures are our estimate.</p>
   <p><strong>Our advice:</strong> for a wallet that holds real value, use 24 words, and for the highest safety use the <a href="https://seedpoet.com/seedpoet-offline.html" download>offline version</a> on a computer without internet.</p>
   <button class="btn small" type="button" popovertarget="strength-info" popovertargetaction="hide">Got it</button>
-</div>
+</div><a href="https://seedpoet.com/about">How it works</a><a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a></div>
+    <aside class="chains" aria-labelledby="chains-title">
+  <p class="chains-title" id="chains-title">Works with</p>
+  <ul>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>BTC</b> Bitcoin</a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>ETH</b> Ethereum</a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>SOL</b> Solana</a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>ADA</b> Cardano<i>24w</i></a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>EVM</b> Polygon, BNB</a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>DOT</b> Polkadot</a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>ATOM</b> Cosmos</a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>TRX</b> Tron</a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>LTC</b> Litecoin</a></li>
+    <li><a href="https://seedpoet.com/about#blockchains"><b>DOGE</b> Dogecoin</a></li>
+  </ul>
+  <p class="chains-note">Any BIP39 wallet: Ledger, Trezor, MetaMask, Phantom, Trust Wallet, Exodus.</p>
+</aside>
+  </div>
+  <div class="out">
+    <div class="term">
+      <div class="term-bar">
+        <span class="hud">seed.poet <span>//</span> <b id="words-label">12</b> words</span>
+        <span class="timer" id="timer" hidden><span class="timer-note">Auto-hide for your security</span><span class="timer-value" id="timer-value">15:00</span></span>
+      </div>
+      <div class="term-body">
+        <ol class="poem-lines" id="poem-lines" translate="no"></ol>
+        <ul class="preview-lines" id="placeholder" aria-hidden="true">
+          <li><span class="ln">01</span><span class="redact w5"></span><span class="redact w6"></span><span class="redact w4"></span></li>
+          <li><span class="ln">02</span><span class="redact w4"></span><span class="redact w7"></span><span class="redact w4"></span></li>
+          <li><span class="ln">03</span><span class="redact w6"></span><span class="redact w4"></span><span class="redact w5"></span></li>
+          <li><span class="ln">04</span><span class="redact w5"></span><span class="redact w5"></span><span class="redact w5"></span></li>
+        </ul>
+        <p class="poem-status" id="poem-status" role="status">Pick 12 or 24 words. Your browser writes the poem; nothing is sent anywhere.</p>
+        <div class="actions" id="actions" hidden>
+          <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
+          <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
+          <button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>
+        </div>
+        <details class="numbered" id="numbered" hidden>
+          <summary>Numbered words, in wallet order</summary>
+          <ol id="numbered-list" translate="no"></ol>
+        </details>
+        <noscript><p class="noscript-box">JavaScript is off: the buttons ask our server to write the poem instead. It is shown once, never stored or logged, and removed after 15 minutes.</p></noscript>
+      </div>
+    </div>
+    <p class="notice">The poem exists only on this page and disappears after 15 minutes or when you leave. Write it on paper or print the PDF, then delete the file. If you copy it, clear your clipboard.</p>
   </div>
 </section>
 </main>
@@ -961,7 +1122,7 @@ main > .chains a {
   <nav aria-label="Footer">
     <a href="https://seedpoet.com/about#privacy">Privacy</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
-    <span>v2.0.3</span>
+    <span>v2.1.0</span>
   </nav>
 </footer>
 <script>/*! Seed Poet word data (BIP39 English + categories + rhymes), generated from data/ */
@@ -1351,7 +1512,7 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   }
 
   return {
-    version: '2.0.3',
+    version: '2.1.0',
     createGenerator: createGenerator,
     normalizeData: normalizeData,
     cryptoRNG: cryptoRNG,
@@ -1493,6 +1654,7 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
 
   var $ = function (id) { return document.getElementById(id); };
   var lines = $('poem-lines');
+  var placeholder = $('placeholder');
   var numbered = $('numbered');
   var numberedList = $('numbered-list');
   var status = $('poem-status');
@@ -1502,7 +1664,8 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   var copyBtn = $('copy-btn');
   var pdfBtn = $('pdf-btn');
   var hideBtn = $('hide-btn');
-  var title = $('poem-title');
+  var wordsLabel = $('words-label');
+  var pickers = document.querySelectorAll('[data-generate]');
 
   var ttl = parseInt(box.getAttribute('data-ttl'), 10) || 900;
   var words = box.getAttribute('data-words') === '24' ? 24 : 12;
@@ -1518,6 +1681,12 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   function setStatus(msg, bad) {
     status.textContent = msg;
     status.className = bad ? 'poem-status expired' : 'poem-status';
+  }
+
+  function markPicker() {
+    Array.prototype.forEach.call(pickers, function (b) {
+      b.setAttribute('aria-pressed', current && b.getAttribute('data-generate') === String(words) ? 'true' : 'false');
+    });
   }
 
   function render(poemLines) {
@@ -1549,12 +1718,14 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
     if (ticker) { clearInterval(ticker); ticker = 0; }
     clear(lines);
     clear(numberedList);
+    if (placeholder) placeholder.hidden = false;
     numbered.hidden = true;
     numbered.open = false;
     timer.hidden = true;
     actions.hidden = true;
     hideBtn.classList.remove('attention');
     hideBtn.textContent = 'I saved it, hide now';
+    markPicker();
     setStatus(message, true);
   }
 
@@ -1573,22 +1744,29 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   function show(poemLines) {
     current = poemLines;
     render(poemLines);
+    if (placeholder) placeholder.hidden = true;
+    wordsLabel.textContent = String(words);
     expiresAt = Date.now() + ttl * 1000;
     timer.hidden = false;
     actions.hidden = false;
     numbered.hidden = false;
     pdfBtn.hidden = !window.SeedPoetPDF;
     copyBtn.hidden = !(navigator.clipboard && navigator.clipboard.writeText);
+    hideBtn.classList.remove('attention');
+    hideBtn.textContent = 'I saved it, hide now';
+    markPicker();
     setStatus('Generated on this device. Nothing was sent or stored.', false);
     tick();
     if (ticker) clearInterval(ticker);
     ticker = setInterval(tick, 1000);
+    // Narrow screens stack the poem under the controls: bring it into view.
+    if (window.matchMedia && window.matchMedia('(max-width: 860px)').matches) {
+      box.querySelector('.out').scrollIntoView({ block: 'start' });
+    }
   }
 
   function generate(n) {
     words = n === 24 ? 24 : 12;
-    box.setAttribute('data-words', String(words));
-    if (title) title.textContent = words + '-word poem';
     try {
       if (!gen) gen = window.SeedPoet.createGenerator(window.SeedPoetData);
       var poem = gen.generate(words);
@@ -1645,27 +1823,14 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
     nudge('PDF saved');
   });
 
-  // "New poem" / "12 words" / "24 words" generate in place; the links still work without JS.
-  Array.prototype.forEach.call(document.querySelectorAll('[data-generate]'), function (el) {
+  // The 12 / 24 buttons submit to the server only without JavaScript; here they
+  // generate on this device instead.
+  Array.prototype.forEach.call(pickers, function (el) {
     el.addEventListener('click', function (e) {
       e.preventDefault();
-      var n = parseInt(el.getAttribute('data-generate'), 10);
-      if (box.getAttribute('data-path') === 'page' && history.replaceState) {
-        history.replaceState(null, '', '/' + n);
-      }
-      generate(n);
-      var other = $('switch-btn');
-      if (other) {
-        var to = n === 24 ? 12 : 24;
-        other.setAttribute('data-generate', String(to));
-        other.setAttribute('href', '/' + to);
-        other.textContent = 'Switch to ' + to;
-      }
+      generate(parseInt(el.getAttribute('data-generate'), 10));
     });
   });
-
-  var noscript = $('noscript-box');
-  if (noscript) noscript.hidden = true;
 
   if (box.getAttribute('data-static') === '1') {
     // Server-rendered poem (no-JavaScript fallback page): take over the timer.
@@ -1674,10 +1839,14 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
       server.push(li.textContent.replace(/^\d+/, '').trim().split(/\s+/));
     });
     if (server.length) show(server);
-  } else if (box.getAttribute('data-autostart') === '1') {
-    generate(words);
-  } else {
-    setStatus('Choose 12 or 24 words. The poem is generated on this device.', false);
+    return;
+  }
+
+  // App shortcuts and old links (/12, /24 redirect here as /?words=N) start a poem at once.
+  var asked = /[?&]words=(12|24)\b/.exec(location.search);
+  if (asked) {
+    if (history.replaceState) history.replaceState(null, '', location.pathname);
+    generate(parseInt(asked[1], 10));
   }
 })();
 </script>
@@ -1694,3 +1863,4 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
 </script>
 </body>
 </html>
+

@@ -69,7 +69,7 @@
         }
       ],
       "name": "12-word poem",
-      "url": "/12"
+      "url": "/?words=12"
     },
     {
       "icons": [
@@ -79,7 +79,7 @@
         }
       ],
       "name": "24-word poem",
-      "url": "/24"
+      "url": "/?words=24"
     }
   ],
   "start_url": "/",

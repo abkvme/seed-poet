@@ -31,7 +31,7 @@ func do(h http.Handler, method, path string, hdr map[string]string) *httptest.Re
 
 func TestPagesHeadersAndSEO(t *testing.T) {
 	h := handler(t)
-	for _, path := range []string{"/", "/12", "/24", "/about", "/expired"} {
+	for _, path := range []string{"/", "/about", "/expired"} {
 		rec := do(h, http.MethodGet, path, nil)
 		if rec.Code != http.StatusOK {
 			t.Fatalf("%s: status %d", path, rec.Code)
@@ -65,16 +65,22 @@ func TestPagesHeadersAndSEO(t *testing.T) {
 	if !strings.Contains(do(h, http.MethodGet, "/about", nil).Body.String(), `id="blockchains"`) {
 		t.Error("/about: blockchains section missing")
 	}
-	if r := do(h, http.MethodGet, "/24", nil); !strings.Contains(r.Body.String(), `content="noindex`) || r.Header().Get("X-Robots-Tag") == "" {
-		t.Error("/24 must be noindex")
+	if r := do(h, http.MethodGet, "/expired", nil); !strings.Contains(r.Body.String(), `content="noindex`) || r.Header().Get("X-Robots-Tag") == "" {
+		t.Error("/expired must be noindex")
+	}
+	// One generator page: old /12 and /24 links start a poem on /.
+	for _, n := range []string{"12", "24"} {
+		if r := do(h, http.MethodGet, "/"+n, nil); r.Code != http.StatusMovedPermanently || r.Header().Get("Location") != "/?words="+n {
+			t.Errorf("/%s: %d %q", n, r.Code, r.Header().Get("Location"))
+		}
 	}
 }
 
-// Static poem pages carry no poem: the browser writes it.
+// The static generator page carries no poem: the browser writes it.
 func TestPoemPagesHaveNoPoem(t *testing.T) {
 	h := handler(t)
 	re := regexp.MustCompile(`(?s)<ol class="poem-lines" id="poem-lines"[^>]*>(.*?)</ol>`)
-	for _, path := range []string{"/12", "/24"} {
+	for _, path := range []string{"/"} {
 		m := re.FindStringSubmatch(do(h, http.MethodGet, path, nil).Body.String())
 		if m == nil || strings.TrimSpace(m[1]) != "" {
 			t.Errorf("%s: poem list must be empty, got %q", path, m)

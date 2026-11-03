@@ -54,23 +54,34 @@ def browser_suite(bt, tmp):
     page.on("request", lambda r: (urlparse(r.url).netloc not in (ORIGIN, "") or r.resource_type in ("fetch", "xhr"))
             and foreign.append(r.method + " " + r.url))
 
+    page.goto(BASE + "/")
+    check(poem_words(page) == [] and page.is_visible("#placeholder"), f"{name}: / starts with no poem")
     for n in (12, 24):
-        page.goto(f"{BASE}/{n}")
+        page.click(f"[data-generate='{n}']")
         words = wait_poem(page, n)
-        check(len(words) == n and M.check(" ".join(words)), f"{name}: /{n} shows a valid {n}-word BIP39 poem")
+        check(len(words) == n and M.check(" ".join(words)), f"{name}: {n} words button writes a valid BIP39 poem")
+    check(page.url.rstrip("/") == BASE, f"{name}: stays on one page ({page.url})")
     check(re.match(r"1[45]:\d\d$", page.inner_text("#timer-value")) is not None and page.is_visible("#timer"),
           f"{name}: timer counts from 15:00 ({page.inner_text('#timer-value')})")
     check("for your security" in page.inner_text("#timer").lower(), f"{name}: security note next to timer")
     check(page.is_visible(".chains") and "Bitcoin" in page.inner_text(".chains"), f"{name}: chain tags shown")
 
-    # In-place new poem and switch.
+    # Pressing again makes a new poem; switching length works in place.
     first = poem_words(page)
-    page.click("a.btn[data-generate]:not(#switch-btn)")
-    second = wait_poem(page, 24)
-    check(second != first and M.check(" ".join(second)), f"{name}: New poem makes a different valid poem")
-    page.click("#switch-btn")
+    page.click("[data-generate='24']")
+    page.wait_for_timeout(200)
+    second = poem_words(page)
+    check(second != first and M.check(" ".join(second)), f"{name}: pressing again makes a different valid poem")
+    page.click("[data-generate='12']")
     w12 = wait_poem(page, 12)
-    check(len(w12) == 12 and M.check(" ".join(w12)) and page.url.endswith("/12"), f"{name}: Switch to 12 works in place")
+    check(len(w12) == 12 and M.check(" ".join(w12)), f"{name}: switch to 12 works in place")
+
+    # Old links and app shortcuts: /24 -> /?words=24 starts a poem, URL cleaned.
+    page.goto(f"{BASE}/24")
+    w = wait_poem(page, 24)
+    check(len(w) == 24 and page.url.rstrip("/") == BASE, f"{name}: /24 redirect starts a 24-word poem ({page.url})")
+    page.click("[data-generate='12']")
+    w12 = wait_poem(page, 12)
 
     # PDF download with clickable links.
     with page.expect_download() as d:
@@ -88,16 +99,18 @@ def browser_suite(bt, tmp):
     check(poem_words(page) == [] and not page.is_visible("#timer"), f"{name}: hide now wipes the poem")
 
     # Back never shows an old poem.
-    page.goto(f"{BASE}/24")
+    page.goto(f"{BASE}/")
+    page.click("[data-generate='24']")
     old = wait_poem(page, 24)
-    page.click(".brand")
+    page.click(".site-nav a[href$='/about']")
     page.wait_for_load_state()
     page.go_back()
     page.wait_for_timeout(800)
     check(poem_words(page) != old, f"{name}: Back does not bring back the old poem")
 
     # Expiry after 15 minutes.
-    page.goto(f"{BASE}/12")
+    page.goto(f"{BASE}/")
+    page.click("[data-generate='12']")
     wait_poem(page, 12)
     page.evaluate("window.__off = 14*60*1000")
     page.wait_for_timeout(1300)
@@ -119,11 +132,22 @@ def browser_suite(bt, tmp):
     check(not errors, f"{name}: no console/CSP errors {errors}")
     check(not foreign, f"{name}: no fetch/xhr or third-party requests {foreign}")
 
+    # Desktop: the whole generator with a 24-word poem fits one screen, no scrolling.
+    for vw, vh in ((1366, 660), (1280, 720), (1920, 950)):
+        pg = ctx.new_page()
+        pg.set_viewport_size({"width": vw, "height": vh})
+        pg.goto(BASE + "/")
+        pg.click("[data-generate='24']")
+        wait_poem(pg, 24)
+        over = pg.evaluate("document.documentElement.scrollHeight - window.innerHeight")
+        check(over <= 0, f"{name}: 24-word poem page fits {vw}x{vh} without scrolling (over {over})")
+        pg.close()
+
     # Small screens: no horizontal scrolling.
     for w in (320, 360, 412):
         pg = ctx.new_page()
         pg.set_viewport_size({"width": w, "height": 740})
-        for path in ("/", "/24", "/about"):
+        for path in ("/", "/about"):
             pg.goto(BASE + path)
             pg.wait_for_timeout(300)
             over = pg.evaluate("document.documentElement.scrollWidth - window.innerWidth")
@@ -134,9 +158,9 @@ def browser_suite(bt, tmp):
     # Without JavaScript: server fallback.
     ctx = b.new_context(java_script_enabled=False)
     page = ctx.new_page()
-    page.goto(f"{BASE}/24")
+    page.goto(f"{BASE}/")
     check(poem_words(page) == [], f"{name} noJS: GET page has no poem")
-    page.click("form[action^='/nojs/'] button")
+    page.click("button[formaction='/nojs/24']")
     page.wait_for_load_state()
     words = poem_words(page)
     check(len(words) == 24 and M.check(" ".join(words)), f"{name} noJS: server poem is valid")
@@ -177,7 +201,8 @@ def chromium_extras(p, tmp):
         page.wait_for_timeout(1000)
         check(page.evaluate("!!navigator.serviceWorker.controller"), "service worker controls the page")
         ctx.set_offline(True)
-        page.goto(BASE + "/24")
+        page.goto(BASE + "/")
+        page.click("[data-generate='24']")
         words = wait_poem(page, 24)
         check(len(words) == 24 and M.check(" ".join(words)), "works offline after first visit")
         ctx.set_offline(False)

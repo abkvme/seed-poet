@@ -82,7 +82,7 @@ func headers(next http.Handler) http.Handler {
 	})
 }
 
-// handleStatic serves web/dist with clean URLs (/12 -> 12.html) and a real 404.
+// handleStatic serves web/dist with clean URLs (/about -> about.html) and a real 404.
 func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
 	p := path.Clean("/" + r.URL.Path)
 	name := strings.TrimPrefix(p, "/")
@@ -96,6 +96,11 @@ func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
 			to = "/"
 		}
 		http.Redirect(w, r, to, http.StatusMovedPermanently)
+		return
+	}
+	if p == "/12" || p == "/24" {
+		// The generator is one page now; old links and bookmarks start a poem there.
+		http.Redirect(w, r, "/?words="+name, http.StatusMovedPermanently)
 		return
 	}
 	if name == "assets.json" {
@@ -127,7 +132,7 @@ func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
 		h.Set("Cache-Control", "public, max-age=86400")
 	}
 	switch name {
-	case "12.html", "24.html", "expired.html":
+	case "expired.html":
 		h.Set("X-Robots-Tag", "noindex, follow")
 	}
 	if ct := contentType(name); ct != "" {

@@ -165,8 +165,8 @@ func manifest() []byte {
 			{"src": "/screenshots/narrow.png", "sizes": "412x915", "type": "image/png", "form_factor": "narrow", "label": "Seed Poet on a phone"},
 		},
 		"shortcuts": []map[string]any{
-			{"name": "12-word poem", "url": "/12", "icons": []map[string]string{{"src": "/icons/icon-192.png", "sizes": "192x192"}}},
-			{"name": "24-word poem", "url": "/24", "icons": []map[string]string{{"src": "/icons/icon-192.png", "sizes": "192x192"}}},
+			{"name": "12-word poem", "url": "/?words=12", "icons": []map[string]string{{"src": "/icons/icon-192.png", "sizes": "192x192"}}},
+			{"name": "24-word poem", "url": "/?words=24", "icons": []map[string]string{{"src": "/icons/icon-192.png", "sizes": "192x192"}}},
 		},
 	}
 	b, err := json.MarshalIndent(m, "", "  ")
@@ -226,8 +226,6 @@ self.addEventListener('fetch', (e) => {
 const robots = `# Seed Poet: https://seedpoet.com
 User-agent: *
 Allow: /
-Disallow: /12
-Disallow: /24
 Disallow: /nojs/
 Disallow: /expired
 

@@ -46,8 +46,7 @@
 <header class="site-header">
   <a class="brand" href="{{.Base}}/">{{if .Offline}}<b>&#x2593;</b>{{else}}<img src="/favicon.svg" alt="" width="30" height="30">{{end}}<span>Seed<b>//</b>Poet</span></a>
   <nav class="site-nav" aria-label="Main">
-    <a href="{{.Base}}/12"{{if eq .Path "/12"}} aria-current="page"{{end}}>12 words</a>
-    <a href="{{.Base}}/24"{{if eq .Path "/24"}} aria-current="page"{{end}}>24 words</a>
+    <a href="{{.Base}}/"{{if eq .Path "/"}} aria-current="page"{{end}}>Generator</a>
     <a href="{{.Base}}/about"{{if eq .Path "/about"}} aria-current="page"{{end}}>About</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>
   </nav>
@@ -88,65 +87,80 @@
 <script src="{{asset "js/site.js"}}" integrity="{{sri "js/site.js"}}" defer></script>
 {{end}}{{end}}
 
+{{define "app-page"}}<!doctype html>
+<html lang="en">
+<head>
+{{template "head" .}}{{if .Poem}}<meta http-equiv="refresh" content="{{.TTL}};url=/expired">
+{{end}}</head>
+<body class="one-screen">
+{{template "header" .}}
+<main id="main">
+{{template "app" .}}
+</main>
+{{template "footer" .}}
+{{template "poem-scripts" .}}</body>
+</html>
+{{end}}
+
 {{define "site-scripts"}}<script src="{{asset "js/site.js"}}" integrity="{{sri "js/site.js"}}" defer></script>{{end}}
 
-{{define "poem-section"}}<section class="poem-wrap" id="poem" data-words="{{.Words}}" data-ttl="{{.TTL}}"{{if .Poem}} data-static="1"{{else if .Offline}}{{else}} data-autostart="1" data-path="page"{{end}} aria-live="polite">
-  <div class="poem-head">
-    <div>
-      <p class="hud">Seed<span>.</span>Poet <span>//</span> BIP39 <span>//</span> {{if .Poem}}server{{else}}on-device{{end}}</p>
-      <h1 id="poem-title">{{if .Words}}{{.Words}}-word poem{{else}}Your poem{{end}}</h1>
-    </div>
-    <div class="timer" id="timer" hidden>
-      <span class="timer-note">Hidden automatically for your security</span>
-      <span class="timer-value" id="timer-value">{{.TTLMinutes}}:00</span>
-    </div>
+{{define "app"}}<section class="app" id="poem" data-words="{{if .Words}}{{.Words}}{{else}}12{{end}}" data-ttl="{{.TTL}}"{{if .Poem}} data-static="1"{{end}}>
+  <div class="side">
+    <p class="hud">BIP39 <span>//</span> rhyme engine <span>//</span> {{if .Poem}}server{{else}}in your browser{{end}}</p>
+    <h1 class="title">Seed Poet</h1>
+    <p class="tagline">Your keys, <em>in verse</em></p>
+    <p class="lede">Generate memorable poems using BIP39 mnemonic words. Each poem is a valid seed phrase for Bitcoin, Ethereum, Solana, Cardano and any other <a href="{{.Base}}/about#blockchains">BIP39 wallet</a>.</p>
+    <form class="pick" method="post" action="/nojs/12" aria-label="Poem length">
+      <button class="btn" type="submit" formaction="/nojs/12" data-generate="12"><span class="k">12</span> words</button>
+      <button class="btn" type="submit" formaction="/nojs/24" data-generate="24"><span class="k">24</span> words</button>
+    </form>
+    <div class="side-links">{{template "strength" .}}<a href="{{.Base}}/about">How it works</a><a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a></div>
+    {{template "chains" .}}
   </div>
-  <div class="poem-grid">
-  <div class="term">
-    <div class="term-body">
-      <ol class="poem-lines" id="poem-lines" translate="no">{{range $i, $l := .Poem}}<li><span class="ln">{{lineNo $i}}</span>{{index $l 0}} {{index $l 1}} <span class="rhyme">{{index $l 2}}</span></li>{{end}}</ol>
-      <p class="poem-status" id="poem-status" role="status"></p>
-      <div class="actions" id="actions"{{if not .Poem}} hidden{{end}}>
-        <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
-        <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
-        {{if .Poem}}<a class="btn small warn" id="hide-btn" href="/expired">I saved it, hide now</a>{{else}}<button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>{{end}}
+  <div class="out">
+    <div class="term">
+      <div class="term-bar">
+        <span class="hud">seed.poet <span>//</span> <b id="words-label">{{if .Words}}{{.Words}}{{else}}12{{end}}</b> words</span>
+        <span class="timer" id="timer" hidden><span class="timer-note">Auto-hide for your security</span><span class="timer-value" id="timer-value">{{.TTLMinutes}}:00</span></span>
       </div>
-      <details class="numbered" id="numbered"{{if not .Poem}} hidden{{end}}>
-        <summary>Numbered words, in wallet order</summary>
-        <ol id="numbered-list" translate="no">{{range .Poem}}{{range .}}<li>{{.}}</li>{{end}}{{end}}</ol>
-      </details>
-      {{if not .Poem}}<noscript><div class="noscript-box" id="noscript-box">
-        <p>JavaScript is off, so this page cannot write a poem on your device. You can let our server write one instead: it is shown once, never stored or logged, and removed from the page after {{.TTLMinutes}} minutes.</p>
-        <form method="post" action="/nojs/{{if eq .Words 24}}24{{else}}12{{end}}"><button class="btn small ghost" type="submit">Generate on the server</button></form>
-      </div></noscript>{{end}}
+      <div class="term-body">
+        <ol class="poem-lines" id="poem-lines" translate="no">{{range $i, $l := .Poem}}<li><span class="ln">{{lineNo $i}}</span>{{index $l 0}} {{index $l 1}} <span class="rhyme">{{index $l 2}}</span></li>{{end}}</ol>
+        {{if not .Poem}}<ul class="preview-lines" id="placeholder" aria-hidden="true">
+          <li><span class="ln">01</span><span class="redact w5"></span><span class="redact w6"></span><span class="redact w4"></span></li>
+          <li><span class="ln">02</span><span class="redact w4"></span><span class="redact w7"></span><span class="redact w4"></span></li>
+          <li><span class="ln">03</span><span class="redact w6"></span><span class="redact w4"></span><span class="redact w5"></span></li>
+          <li><span class="ln">04</span><span class="redact w5"></span><span class="redact w5"></span><span class="redact w5"></span></li>
+        </ul>{{end}}
+        <p class="poem-status" id="poem-status" role="status">{{if not .Poem}}Pick 12 or 24 words. Your browser writes the poem; nothing is sent anywhere.{{end}}</p>
+        <div class="actions" id="actions"{{if not .Poem}} hidden{{end}}>
+          <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
+          <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
+          {{if .Poem}}<a class="btn small warn" id="hide-btn" href="/expired">I saved it, hide now</a>{{else}}<button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>{{end}}
+        </div>
+        <details class="numbered" id="numbered"{{if not .Poem}} hidden{{end}}>
+          <summary>Numbered words, in wallet order</summary>
+          <ol id="numbered-list" translate="no">{{range .Poem}}{{range .}}<li>{{.}}</li>{{end}}{{end}}</ol>
+        </details>
+        {{if not .Poem}}<noscript><p class="noscript-box">JavaScript is off: the buttons ask our server to write the poem instead. It is shown once, never stored or logged, and removed after {{.TTLMinutes}} minutes.</p></noscript>{{end}}
+      </div>
     </div>
-  </div>
-  {{template "chains" .}}
-  </div>
-  <p class="notice">{{if .Poem}}JavaScript is off, so our server wrote this poem. It was not stored or logged and cannot be shown again.{{else}}This poem is written by your browser and exists only on this page. Nothing is sent to any server.{{end}} Write it down on paper or print the PDF, then delete the PDF file. If you copy it, clear your clipboard.</p>
-  <div class="below">
-    <div class="cta">
-      {{if .Offline}}<a class="btn" href="#" data-generate="12">12 words</a>
-      <a class="btn" href="#" data-generate="24">24 words</a>{{else}}<a class="btn" href="/{{.Words}}" data-generate="{{.Words}}">New poem</a>
-      <a class="btn ghost" id="switch-btn" href="/{{.Other}}" data-generate="{{.Other}}">Switch to {{.Other}}</a>{{end}}
-    </div>
-    {{template "strength" .}}
+    <p class="notice">{{if .Poem}}JavaScript is off, so our server wrote this poem. It was not stored or logged and cannot be shown again.{{else}}The poem exists only on this page and disappears after {{.TTLMinutes}} minutes or when you leave.{{end}} Write it on paper or print the PDF, then delete the file. If you copy it, clear your clipboard.</p>
   </div>
 </section>{{end}}
 
 {{define "chains"}}<aside class="chains" aria-labelledby="chains-title">
-  <p class="hud" id="chains-title">Works with</p>
+  <p class="chains-title" id="chains-title">Works with</p>
   <ul>
     <li><a href="{{.Base}}/about#blockchains"><b>BTC</b> Bitcoin</a></li>
     <li><a href="{{.Base}}/about#blockchains"><b>ETH</b> Ethereum</a></li>
     <li><a href="{{.Base}}/about#blockchains"><b>SOL</b> Solana</a></li>
-    <li><a href="{{.Base}}/about#blockchains"><b>ADA</b> Cardano <i>24w</i></a></li>
-    <li><a href="{{.Base}}/about#blockchains"><b>EVM</b> Polygon, BNB, Base</a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>ADA</b> Cardano<i>24w</i></a></li>
+    <li><a href="{{.Base}}/about#blockchains"><b>EVM</b> Polygon, BNB</a></li>
     <li><a href="{{.Base}}/about#blockchains"><b>DOT</b> Polkadot</a></li>
     <li><a href="{{.Base}}/about#blockchains"><b>ATOM</b> Cosmos</a></li>
     <li><a href="{{.Base}}/about#blockchains"><b>TRX</b> Tron</a></li>
     <li><a href="{{.Base}}/about#blockchains"><b>LTC</b> Litecoin</a></li>
     <li><a href="{{.Base}}/about#blockchains"><b>DOGE</b> Dogecoin</a></li>
   </ul>
-  <p class="chains-note">Any BIP39 wallet: Ledger, Trezor, MetaMask, Phantom, Trust Wallet, Exodus</p>
+  <p class="chains-note">Any BIP39 wallet: Ledger, Trezor, MetaMask, Phantom, Trust Wallet, Exodus.</p>
 </aside>{{end}}
