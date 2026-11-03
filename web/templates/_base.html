@@ -45,7 +45,7 @@
 {{define "header"}}<a class="skip" href="#main">Skip to content</a>
 <canvas id="rain" aria-hidden="true"></canvas>
 <header class="site-header">
-  <a class="brand" href="{{.Base}}/" aria-label="Seed Poet home">{{if .Offline}}<b>&#x2593;</b>{{else}}<img src="/favicon.svg" alt="" width="30" height="30">{{end}}<span>Seed<b>//</b>Poet</span></a>
+  <a class="brand" href="{{.Base}}/">{{if .Offline}}<b>&#x2593;</b>{{else}}<img src="/favicon.svg" alt="" width="30" height="30">{{end}}<span>Seed<b>//</b>Poet</span></a>
   <nav class="site-nav" aria-label="Main">
     <a href="{{.Base}}/12"{{if eq .Path "/12"}} aria-current="page"{{end}}>12 words</a>
     <a href="{{.Base}}/24"{{if eq .Path "/24"}} aria-current="page"{{end}}>24 words</a>
