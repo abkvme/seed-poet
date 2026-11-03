@@ -8,6 +8,7 @@
     <meta http-equiv="refresh" content="{{.TTL}};url=/expired">{{end}}
     <title>{{.WordCount}}-Word Poem - Seed Poet</title>
     <link rel="stylesheet" href="/static/css/poem.css">
+    <link rel="stylesheet" href="/static/css/strength.css">
     <script src="/static/js/poem.js" defer></script>
 </head>
 <body>
@@ -16,6 +17,11 @@
         <div class="poem" id="poem" data-words="{{.WordCount}}" data-ttl="{{.TTL}}"{{if .Poem}} data-static="1"{{end}}>
             <button class="copy-btn" id="copy-btn" type="button" hidden>Copy</button>
             <pre id="poem-text" translate="no">{{if .Poem}}{{.Poem}}{{end}}</pre>
+            <div class="timer" id="poem-timer" hidden>
+                <span class="timer-label">Shown for</span>
+                <span class="timer-value" id="timer-value">{{.TTLMinutes}}:00</span>
+                <span class="timer-note">Hidden automatically for your security</span>
+            </div>
             <p class="status" id="poem-status"></p>
             {{if not .Poem}}<noscript>
                 <form method="post" action="/{{.WordCount}}">
@@ -24,6 +30,7 @@
             </noscript>{{end}}
         </div>
         <p class="notice" id="poem-notice">This poem exists only in this page. It was never stored on the server, and it disappears from this page after {{.TTLMinutes}} minutes or when you leave it. Write it down on paper; if you copy it, clear your clipboard afterwards.</p>
+        {{template "strength" .}}
         <div class="buttons">
             <a href="/{{.WordCount}}" class="btn">Generate Another</a>
             {{if eq .WordCount 12}}

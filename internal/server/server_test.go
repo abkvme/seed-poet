@@ -155,7 +155,13 @@ func TestPagesAndCredit(t *testing.T) {
 			t.Errorf("%s: inline style/script would break the CSP", path)
 		}
 	}
-	for _, path := range []string{"/static/css/poem.css", "/static/js/poem.js", "/robots.txt"} {
+	for _, path := range []string{"/", "/12", "/24"} {
+		body := do(h, http.MethodGet, path, "", nil).Body.String()
+		if !strings.Contains(body, `popovertarget="strength-info"`) || !strings.Contains(body, "about 88 bits") {
+			t.Errorf("%s: strength disclaimer missing", path)
+		}
+	}
+	for _, path := range []string{"/static/css/strength.css", "/static/css/poem.css", "/static/js/poem.js", "/robots.txt"} {
 		if rec := do(h, http.MethodGet, path, "", nil); rec.Code != http.StatusOK {
 			t.Errorf("%s: status %d", path, rec.Code)
 		}

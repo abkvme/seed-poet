@@ -10,6 +10,8 @@
   var text = document.getElementById('poem-text');
   var status = document.getElementById('poem-status');
   var copyBtn = document.getElementById('copy-btn');
+  var timerBox = document.getElementById('poem-timer');
+  var timerValue = document.getElementById('timer-value');
   var ttl = parseInt(box.getAttribute('data-ttl'), 10) || 900;
   var words = box.getAttribute('data-words') === '24' ? 24 : 12;
   var expiresAt = 0;
@@ -22,6 +24,7 @@
     text.textContent = '';
     while (text.firstChild) text.removeChild(text.firstChild);
     copyBtn.hidden = true;
+    timerBox.hidden = true;
     status.className = 'status expired';
     status.textContent = message;
   }
@@ -34,14 +37,17 @@
       return;
     }
     var m = Math.floor(left / 60), s = left % 60;
+    timerValue.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    timerValue.className = left <= 60 ? 'timer-value low' : 'timer-value';
     status.className = 'status';
-    status.textContent = 'Disappears in ' + m + ':' + (s < 10 ? '0' : '') + s;
+    status.textContent = '';
   }
 
   function show(poem) {
     text.textContent = poem;
     expiresAt = Date.now() + ttl * 1000;
     copyBtn.hidden = false;
+    timerBox.hidden = false;
     tick();
     timer = setInterval(tick, 1000);
   }

@@ -1,0 +1,14 @@
+{{define "strength"}}
+        <button class="strength-btn" type="button" popovertarget="strength-info">&#9888;&#xFE0F; How strong is a poem seed?</button>
+        <div id="strength-info" class="strength-popup" popover role="dialog" aria-labelledby="strength-title">
+            <h2 id="strength-title">How strong is a poem seed?</h2>
+            <p>A Seed Poet poem is a valid BIP39 phrase, but it is a little weaker than a fully random one. Rhymes, syllable counts and the verb, adjective, noun pattern limit which words can go where.</p>
+            <ul>
+                <li><strong>12 words:</strong> about 88 bits of randomness (fully random BIP39: 128 bits)</li>
+                <li><strong>24 words:</strong> about 176 bits (fully random BIP39: 256 bits)</li>
+            </ul>
+            <p>Even 88 bits is about 3 &times; 10<sup>26</sup> possible poems, far beyond any known brute-force attack, including one by someone who knows you used Seed Poet. These figures are our estimate.</p>
+            <p><strong>Our advice:</strong> for a wallet that holds real value, use 24 words, and for the highest safety run Seed Poet offline from <a href="https://github.com/abkvme/seed-poet" target="_blank" rel="noopener noreferrer">its open source code</a>.</p>
+            <button class="strength-close" type="button" popovertarget="strength-info" popovertargetaction="hide">Got it</button>
+        </div>
+{{end}}

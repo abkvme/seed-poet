@@ -19,8 +19,8 @@ var (
 )
 
 func init() {
-	landingTemplate = template.Must(template.ParseFS(templateFS, "templates/landing.html"))
-	poemTemplate = template.Must(template.ParseFS(templateFS, "templates/poem.html"))
+	landingTemplate = template.Must(template.ParseFS(templateFS, "templates/landing.html", "templates/strength.html"))
+	poemTemplate = template.Must(template.ParseFS(templateFS, "templates/poem.html", "templates/strength.html"))
 	aboutTemplate = template.Must(template.ParseFS(templateFS, "templates/about.html"))
 	expiredTemplate = template.Must(template.ParseFS(templateFS, "templates/expired.html"))
 }

@@ -13,7 +13,7 @@ import (
 
 const (
 	appName    = "Seed Poet"
-	appVersion = "1.2.0"
+	appVersion = "1.2.1"
 )
 
 func main() {

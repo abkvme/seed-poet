@@ -142,3 +142,29 @@ a.btn.secondary:hover {
 [hidden] {
     display: none !important;
 }
+.timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    margin-top: 1.25rem;
+}
+.timer-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8fb08f;
+}
+.timer-value {
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    color: #4ade80;
+}
+.timer-value.low {
+    color: #fca5a5;
+}
+.timer-note {
+    font-size: 0.8rem;
+    color: #8fb08f;
+}

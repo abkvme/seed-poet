@@ -45,6 +45,7 @@
     </script>
 
     <link rel="stylesheet" href="/static/css/landing.css">
+    <link rel="stylesheet" href="/static/css/strength.css">
 </head>
 <body>
     <div class="container">
@@ -56,6 +57,7 @@
             <a href="/12" class="btn">12 Words</a>
             <a href="/24" class="btn">24 Words</a>
         </div>
+        {{template "strength" .}}
         <p class="info">Strict rhymes &bull; Couplet structure &bull; 2048 BIP39 words</p>
         <p class="about-link"><a href="/about">Learn more about Seed Poet</a></p>
     </div>
