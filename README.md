@@ -55,7 +55,8 @@ Access it at `http://localhost:8080`.
 - **Randomness**: every poem is drawn from a ChaCha8 generator seeded from `crypto/rand` (the OS random source). Nothing is predictable from earlier poems.
 - **Checksum**: the last word of a BIP39 phrase carries a checksum. Seed Poet draws random poems and keeps only one whose checksum is correct, so the choice stays uniform among valid poems.
 - **Strength**: the rhyme and grammar rules limit which words can appear where, so a poem holds less randomness than a free BIP39 phrase of the same length. Our estimate: about 88 bits for 12 words (a free 12-word phrase has 128) and about 176 bits for 24 words (free: 256). For a wallet that holds real value, use 24 words.
-- **Privacy**: poems are generated in memory and never logged or stored. Pages are served with `Cache-Control: no-store` and `Referrer-Policy: no-referrer`. For a real wallet, run the binary offline on your own machine rather than trusting any website.
+- **Privacy (web)**: a poem is generated in memory, never logged, stored or put in a URL. A `GET` of `/12` or `/24` returns a page with no poem in it; the page's script fetches one with a `POST /api/poem`, so crawlers, link previews, history and caches never see a seed. The poem is wiped from the page after 15 minutes and whenever the user leaves the page (Back never shows an old poem). Without JavaScript, a form `POST` shows the poem with a refresh to `/expired` after 15 minutes. Every response carries a strict CSP (own origin only, no inline code), `Cache-Control: no-store`, `no-referrer`, `X-Frame-Options: DENY` and `noindex`. No cookies, analytics or third-party code.
+- For a real wallet, run the binary offline on your own machine rather than trusting any website.
 
 ## Development
 

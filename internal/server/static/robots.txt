@@ -6,6 +6,8 @@ Allow: /
 Allow: /about
 Disallow: /12
 Disallow: /24
+Disallow: /api/
+Disallow: /expired
 
 # Sitemap
 Sitemap: https://seedpoet.com/sitemap.xml
