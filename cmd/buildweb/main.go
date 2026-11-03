@@ -202,6 +202,8 @@ self.addEventListener('activate', (e) => {
     .then(() => self.clients.claim()));
 });
 
+const PRECACHED = new Set(URLS);
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
@@ -210,10 +212,13 @@ self.addEventListener('fetch', (e) => {
   if (req.mode === 'navigate') {
     // Network first so updates show at once; the cached page when offline.
     e.respondWith(fetch(req).catch(() =>
-      caches.match(url.pathname).then((r) => r || caches.match('/'))));
+      caches.match(url.pathname).then((r) => r || caches.match('/')).then((r) => r || Response.error())));
     return;
   }
-  e.respondWith(caches.match(req).then((r) => r || fetch(req)));
+  // Only the site's own precached files are served from the cache; anything else
+  // goes to the network untouched (the worker does not intercept it at all).
+  if (!PRECACHED.has(url.pathname)) return;
+  e.respondWith(caches.match(url.pathname).then((hit) => hit || fetch(req).catch(() => Response.error())));
 });
 `)
 }
