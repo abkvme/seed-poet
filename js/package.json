@@ -1,6 +1,6 @@
 {
   "name": "seed-poet",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "BIP39 seed phrases written as rhyming couplets. Zero-dependency JavaScript port of the Go library, identical output from the same random bytes.",
   "main": "seedpoet.js",
   "files": ["seedpoet.js"],
