@@ -23,7 +23,7 @@ import (
 
 // Version of Seed Poet (Go library, CLI, website). The JavaScript library
 // (js/package.json) carries the same number; a test keeps them equal.
-const Version = "2.1.2"
+const Version = "2.1.3"
 
 // Poem is a generated poem: Lines of three words (verb, adjective, rhyming noun).
 type Poem = generator.Poem

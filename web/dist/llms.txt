@@ -15,7 +15,7 @@ Seed Poet is free and open source (MIT), developed by OxiSoft (https://oxisoft.i
 - Without JavaScript, the server can generate a poem instead; it is shown once and never stored or logged.
 - Works offline, installs as an app (PWA), and has a single-file offline version.
 - Two identical implementations: Go (library + CLI) and dependency-free JavaScript; the same random bytes give the same poem.
-- Version 2.1.2.
+- Version 2.1.3.
 
 ## Links
 - Website: https://seedpoet.com
