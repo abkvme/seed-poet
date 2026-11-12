@@ -2,11 +2,14 @@
 
     uv run --with playwright --with pypdf --with mnemonic python web/tools/e2e.py [base-url]
 
-Default base-url: http://127.0.0.1:8080 (`go run ./cmd/seedpoet serve`). Chromium + Firefox.
+Default base-url: http://127.0.0.1:8080 (`go run ./cmd/seedpoet serve`). Chromium + Firefox;
+E2E_BROWSERS=webkit (or a comma list) picks engines. WebKit (Safari's engine) needs Ubuntu: run
+it in the official Playwright container or in CI.
 Generated poems are checked with the reference BIP39 library (python-mnemonic). Downloaded
 PDFs and offline files go to a temp dir that is deleted at the end: they hold real seeds.
 """
 import io
+import os
 import re
 import shutil
 import sys
@@ -59,7 +62,9 @@ def browser_suite(bt, tmp):
     errors, foreign = [], []
     page.on("console", lambda m: m.type == "error" and errors.append(m.text))
     page.on("pageerror", lambda e: errors.append(str(e)))
-    page.on("request", lambda r: (urlparse(r.url).netloc not in (ORIGIN, "") or r.resource_type in ("fetch", "xhr"))
+    # WebKit reports the service worker script download (GET /sw.js, no body) as "fetch".
+    page.on("request", lambda r: (urlparse(r.url).netloc not in (ORIGIN, "")
+                                  or (r.resource_type in ("fetch", "xhr") and r.url != BASE + "/sw.js"))
             and foreign.append(r.method + " " + r.url))
 
     page.goto(BASE + "/")
@@ -223,9 +228,11 @@ def main():
     tmp = tempfile.mkdtemp(prefix="seedpoet-e2e-")
     try:
         with sync_playwright() as p:
-            for bt in (p.chromium, p.firefox):
-                browser_suite(bt, tmp)
-            chromium_extras(p, tmp)
+            names = [n.strip() for n in os.environ.get("E2E_BROWSERS", "chromium,firefox").split(",") if n.strip()]
+            for name in names:
+                browser_suite(getattr(p, name), tmp)
+            if "chromium" in names:
+                chromium_extras(p, tmp)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print("ALL OK" if not failures else f"{len(failures)} FAILED")

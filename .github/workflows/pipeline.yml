@@ -42,9 +42,34 @@ jobs:
       - name: Test (same poems as Go, BIP39 vectors)
         run: node --test js/
 
+  webkit:
+    name: Browser tests in WebKit (Safari engine)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+      - name: Install Playwright WebKit
+        run: |
+          pip install playwright pypdf mnemonic
+          python -m playwright install --with-deps webkit
+      - name: Start local site
+        run: |
+          go build -o bin/seedpoet ./cmd/seedpoet
+          ./bin/seedpoet serve > /tmp/seedpoet.log 2>&1 &
+          for i in $(seq 30); do curl -sf http://localhost:8080/ > /dev/null && break; sleep 1; done
+      - name: e2e (WebKit)
+        env:
+          E2E_BROWSERS: webkit
+        run: python web/tools/e2e.py http://localhost:8080
+
   release:
     name: Create Release
-    needs: [go, js]
+    needs: [go, js, webkit]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
