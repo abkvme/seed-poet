@@ -31,6 +31,32 @@ jobs:
       - name: Test
         run: go test -race ./...
 
+  coverage:
+    name: Test coverage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Coverage of the library and its internal packages (floor 80%)
+        run: |
+          go test -coverprofile=coverage.out -coverpkg=./seedpoet,./internal/... ./seedpoet ./internal/...
+          go tool cover -func=coverage.out | tee coverage.txt
+          total=$(awk '/^total:/ {sub("%","",$3); print $3}' coverage.txt)
+          echo "### Test coverage: ${total}%" >> "$GITHUB_STEP_SUMMARY"
+          awk -v t="$total" 'BEGIN { exit (t >= 80) ? 0 : 1 }' || (echo "coverage ${total}% is below 80%" && exit 1)
+      - name: Upload to Codecov (OIDC, no secret)
+        uses: codecov/codecov-action@v7
+        with:
+          use_oidc: true
+          files: coverage.out
+          disable_search: true
+          fail_ci_if_error: false
+
   js:
     name: JavaScript tests
     runs-on: ubuntu-latest
