@@ -1,3 +1,5 @@
+// Package syllable estimates English syllable counts with a vowel-group heuristic.
+// The JavaScript port in js/seedpoet.js mirrors it exactly.
 package syllable
 
 import (
@@ -6,6 +8,8 @@ import (
 
 var vowels = "aeiouy"
 
+// Count returns the estimated number of syllables in word (at least 1 for a
+// non-empty word, 0 for an empty one).
 func Count(word string) int {
 	word = strings.ToLower(word)
 	if len(word) == 0 {
@@ -41,24 +45,12 @@ func Count(word string) int {
 		}
 	}
 
-	// -es ending is usually silent
-	if len(word) > 3 && strings.HasSuffix(word, "es") {
-		if !strings.ContainsRune(vowels, rune(word[len(word)-3])) {
-			// consonant + es, don't count extra
-		}
-	}
-
 	// -ed ending is usually silent unless preceded by t or d
 	if len(word) > 2 && strings.HasSuffix(word, "ed") {
 		lastConsonant := word[len(word)-3]
 		if lastConsonant != 't' && lastConsonant != 'd' {
 			count--
 		}
-	}
-
-	// -ion is one syllable, not two
-	if strings.HasSuffix(word, "tion") || strings.HasSuffix(word, "sion") {
-		// Already counted correctly by vowel grouping
 	}
 
 	// Minimum 1 syllable
@@ -69,7 +61,7 @@ func Count(word string) int {
 	return count
 }
 
-// CountAll returns syllable counts for a list of words
+// CountAll returns the syllable count of every word, keyed by the word.
 func CountAll(words []string) map[string]int {
 	counts := make(map[string]int)
 	for _, word := range words {

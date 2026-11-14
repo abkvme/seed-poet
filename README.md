@@ -1,7 +1,7 @@
 # Seed Poet: BIP39 seed phrase generator that writes your wallet key as a rhyming poem
 
 [![CI](https://github.com/abkvme/seed-poet/actions/workflows/pipeline.yml/badge.svg)](https://github.com/abkvme/seed-poet/actions/workflows/pipeline.yml)
-[![Release](https://img.shields.io/github/v/release/abkvme/seed-poet)](https://github.com/abkvme/seed-poet/releases) [![Go Reference](https://pkg.go.dev/badge/github.com/abkvme/seed-poet/v2.svg)](https://pkg.go.dev/github.com/abkvme/seed-poet/v2/seedpoet)
+[![Release](https://img.shields.io/github/v/release/abkvme/seed-poet)](https://github.com/abkvme/seed-poet/releases) [![Go Reference](https://pkg.go.dev/badge/github.com/abkvme/seed-poet/v2.svg)](https://pkg.go.dev/github.com/abkvme/seed-poet/v2/seedpoet) [![Coverage](https://codecov.io/gh/abkvme/seed-poet/graph/badge.svg)](https://app.codecov.io/gh/abkvme/seed-poet)
 [![License: MIT](https://img.shields.io/badge/license-MIT-00ff9c.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/try%20it-seedpoet.com-00ff9c)](https://seedpoet.com)
 

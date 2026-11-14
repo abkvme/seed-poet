@@ -1,3 +1,4 @@
+// Package rhyme indexes the BIP39 words by rhyme group (data/seedpoet.json).
 package rhyme
 
 import (
@@ -6,6 +7,7 @@ import (
 	"github.com/abkvme/seed-poet/v2/data"
 )
 
+// Index maps a rhyme key to its words and lists the keys usable for couplets.
 type Index struct {
 	Groups    map[string][]string
 	ValidKeys []string // largest group first, ties by key (same order in the JS library)
@@ -30,10 +32,12 @@ func BuildPhoneticIndex() *Index {
 	return &Index{Groups: groups, ValidKeys: keys}
 }
 
+// GetGroup returns the words of the rhyme group key (nil if unknown).
 func (idx *Index) GetGroup(key string) []string {
 	return idx.Groups[key]
 }
 
+// GetValidKeys returns the keys of groups with at least two words, largest first.
 func (idx *Index) GetValidKeys() []string {
 	return idx.ValidKeys
 }
