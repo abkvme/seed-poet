@@ -166,6 +166,12 @@ make generate    # rebuild data/seedpoet.json from the Python word lists
 | `cmd/seedpoet` | CLI and server; `cmd/buildweb` builds the website |
 | `scripts/` | Python sources of the word categories and rhyme groups |
 
+## Related
+
+- **[MnemoSSH](https://github.com/abkvme/mnemossh)**: turns a BIP39 phrase into an Ed25519 SSH
+  key. A Seed Poet poem is a valid phrase, so `mnemossh restore` with its words gives you an SSH
+  key you can back up as a poem. More: [oxisoft.io/open-source/mnemossh](https://oxisoft.io/open-source/mnemossh/).
+
 ## License
 
 MIT, see [LICENSE](LICENSE).

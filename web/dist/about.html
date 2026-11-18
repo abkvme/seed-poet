@@ -90,6 +90,9 @@
     <li>A 12-word poem holds about 88 bits of randomness and a 24-word poem about 176, because rhymes limit word choice. For a wallet with real value, use 24 words and the <a href="/seedpoet-offline.html" download>offline version</a>.</li>
   </ul>
 
+  <h2 id="ssh">Also for SSH keys</h2>
+  <p>A poem is a valid BIP39 phrase, so it can back up more than a wallet. <a href="https://oxisoft.io/open-source/mnemossh/">MnemoSSH</a>, an open-source tool from the same team, turns a BIP39 phrase into an Ed25519 SSH key. Run <code>mnemossh restore</code> with the words of your poem and you get the same key back on any machine.</p>
+
   <h2>Technology</h2>
   <p>Seed Poet is open source under the MIT license. The generator exists twice, in Go and in plain JavaScript with no dependencies, and both produce exactly the same poem from the same random bytes. This website runs the JavaScript version in your browser. The source code is on <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>.</p>
 
@@ -104,7 +107,7 @@
     <a href="/about#privacy">Privacy</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
     <a href="/seedpoet-offline.html" download>Offline version</a>
-    <span>v2.1.3</span>
+    <span>v2.1.4</span>
   </nav>
 </footer>
 <script src="/assets/site.8bce1e819a.js" integrity="sha384-xiZQgrBaaD6MtDyg2utRsIkGRQCaCKykarYEiUH/lqrd8PwF7SvZibePV4Z1TA4B" defer></script>
