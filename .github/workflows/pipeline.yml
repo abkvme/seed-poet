@@ -71,6 +71,7 @@ jobs:
   webkit:
     name: Browser tests in WebKit (Safari engine)
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -80,9 +81,15 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install Playwright WebKit
+        # The install (apt deps + browser download) sometimes hangs for good (v2.1.4, v2.1.5):
+        # cap each try at 5 minutes and retry instead of waiting for the 6 h job limit.
         run: |
           pip install playwright pypdf mnemonic
-          python -m playwright install --with-deps webkit
+          for i in 1 2 3; do
+            timeout 300 python -m playwright install --with-deps webkit && exit 0
+            echo "playwright install try $i failed or hung, retrying"; sleep 10
+          done
+          exit 1
       - name: Start local site
         run: |
           go build -o bin/seedpoet ./cmd/seedpoet
