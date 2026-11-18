@@ -1034,6 +1034,49 @@ main > .chains a {
     background: #fff;
   }
 }
+
+/* ---------- Word list ---------- */
+.prose h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  color: var(--green);
+}
+
+.prose h3 small {
+  color: var(--dim);
+  font-size: 0.8rem;
+  font-weight: normal;
+}
+
+.word-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.word-group {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.prose ul.words {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.8rem;
+}
+
+.prose ul.words li {
+  margin: 0;
+  color: var(--ink);
+}
+
+.prose.wordlist {
+  max-width: 1000px;
+}
 </style>
 </head>
 <body class="one-screen">
@@ -1043,6 +1086,7 @@ main > .chains a {
   <nav class="site-nav" aria-label="Main">
     <a href="https://seedpoet.com/">Generator</a>
     <a href="https://seedpoet.com/about">About</a>
+    <a href="https://seedpoet.com/wordlist">Wordlist</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>
   </nav>
 </header>
@@ -1121,8 +1165,9 @@ main > .chains a {
   <p class="credit">Developed by <a href="https://oxisoft.io" rel="noopener">OxiSoft</a></p>
   <nav aria-label="Footer">
     <a href="https://seedpoet.com/about#privacy">Privacy</a>
+    <a href="https://seedpoet.com/wordlist">BIP39 word list</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
-    <span>v2.1.4</span>
+    <span>v2.1.5</span>
   </nav>
 </footer>
 <script>/*! Seed Poet word data (BIP39 English + categories + rhymes), generated from data/ */
@@ -1512,7 +1557,7 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   }
 
   return {
-    version: '2.1.4',
+    version: '2.1.5',
     createGenerator: createGenerator,
     normalizeData: normalizeData,
     cryptoRNG: cryptoRNG,

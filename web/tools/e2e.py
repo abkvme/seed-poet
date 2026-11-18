@@ -160,12 +160,21 @@ def browser_suite(bt, tmp):
     for w in (320, 360, 412):
         pg = ctx.new_page()
         pg.set_viewport_size({"width": w, "height": 740})
-        for path in ("/", "/about"):
+        for path in ("/", "/about", "/wordlist"):
             pg.goto(BASE + path)
             pg.wait_for_timeout(300)
             over = pg.evaluate("document.documentElement.scrollWidth - window.innerWidth")
             check(over <= 0, f"{name}: {path} fits {w}px (overflow {over})")
         pg.close()
+
+    # /wordlist: the whole BIP39 list, every word once, no script needed.
+    pg = ctx.new_page()
+    pg.goto(BASE + "/wordlist")
+    listed = pg.eval_on_selector_all("ul.words li", "els => els.map(e => e.textContent.trim())")
+    check(len(listed) == 2048 and len(set(listed)) == 2048 and set(listed) == set(M.wordlist),
+          f"{name}: /wordlist lists 2048 unique BIP39 words ({len(listed)}, {len(set(listed))} unique)")
+    check(pg.get_attribute("link[rel=canonical]", "href") == "https://seedpoet.com/wordlist", f"{name}: /wordlist canonical")
+    pg.close()
     ctx.close()
 
     # Without JavaScript: server fallback.

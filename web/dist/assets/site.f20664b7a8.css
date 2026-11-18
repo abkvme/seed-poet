@@ -999,3 +999,46 @@ main > .chains a {
     background: #fff;
   }
 }
+
+/* ---------- Word list ---------- */
+.prose h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  color: var(--green);
+}
+
+.prose h3 small {
+  color: var(--dim);
+  font-size: 0.8rem;
+  font-weight: normal;
+}
+
+.word-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.word-group {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.prose ul.words {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.8rem;
+}
+
+.prose ul.words li {
+  margin: 0;
+  color: var(--ink);
+}
+
+.prose.wordlist {
+  max-width: 1000px;
+}

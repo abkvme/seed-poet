@@ -48,6 +48,7 @@
   <nav class="site-nav" aria-label="Main">
     <a href="{{.Base}}/"{{if eq .Path "/"}} aria-current="page"{{end}}>Generator</a>
     <a href="{{.Base}}/about"{{if eq .Path "/about"}} aria-current="page"{{end}}>About</a>
+    <a href="{{.Base}}/wordlist"{{if eq .Path "/wordlist"}} aria-current="page"{{end}}>Wordlist</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>
   </nav>
 </header>{{end}}
@@ -56,6 +57,7 @@
   <p class="credit">Developed by <a href="https://oxisoft.io" rel="noopener">OxiSoft</a></p>
   <nav aria-label="Footer">
     <a href="{{.Base}}/about#privacy">Privacy</a>
+    <a href="{{.Base}}/wordlist">BIP39 word list</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
     {{if not .Offline}}<a href="/seedpoet-offline.html" download>Offline version</a>
     {{end}}<span>v{{.Version}}</span>

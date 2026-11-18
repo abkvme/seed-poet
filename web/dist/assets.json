@@ -1,7 +1,7 @@
 {
   "css/site.css": {
-    "path": "/assets/site.335c2f3a01.css",
-    "sri": "sha384-lu3DPkSQCzfOSWGS7NX8PT0SzwiTruu73PCiY7JINJXO6FvJod6717RtrLndvT+V"
+    "path": "/assets/site.f20664b7a8.css",
+    "sri": "sha384-bKSHoNoFDDZFG3ko3I+jrEs//f7dBJNuD9TlZRC6YCsDUt0axlgky5FN2iXWBhSS"
   },
   "js/app.js": {
     "path": "/assets/app.94382dfcaf.js",
@@ -16,8 +16,8 @@
     "sri": "sha384-vQwK27xOJUP5WORLBFv1TXYoutKR1XSk6gRVWq3ChKA3i0uLHBThpVz2r0APhem/"
   },
   "js/seedpoet.js": {
-    "path": "/assets/seedpoet.c02fd7de17.js",
-    "sri": "sha384-1/x9bWFDvy5+tPWmZvkWPQ/rnNFfnl67CR7mUTezOIemf1HtVc1fwDDDzti2N8zY"
+    "path": "/assets/seedpoet.651e859422.js",
+    "sri": "sha384-buK2EgQ3z44ymjYEpzQakaR6E7QFi5vMBNoN7chmDQo+C4+992ygcY0ql2wSDVLh"
   },
   "js/site.js": {
     "path": "/assets/site.8bce1e819a.js",

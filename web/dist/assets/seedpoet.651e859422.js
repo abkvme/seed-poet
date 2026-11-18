@@ -382,7 +382,7 @@
   }
 
   return {
-    version: '2.1.4',
+    version: '2.1.5',
     createGenerator: createGenerator,
     normalizeData: normalizeData,
     cryptoRNG: cryptoRNG,

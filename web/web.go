@@ -59,6 +59,7 @@ type Page struct {
 	Version       string
 	JSONLD        template.JS
 	InSitemap     bool
+	Wordlist      *Wordlist
 }
 
 // Renderer renders pages with fingerprinted asset URLs (and, for the offline
@@ -260,6 +261,11 @@ func Pages() []Page {
 			Description: "How Seed Poet writes a BIP39 seed phrase as a rhyming poem, which blockchains and wallets accept it, how strong it is, and how it keeps it private.",
 			OGTitle:     "About Seed Poet", OGDescription: ogDesc,
 			Canonical: Site + "/about", JSONLD: aboutLD(), InSitemap: true}),
+		base(Page{Template: "wordlist.html", File: "wordlist.html", Path: "/wordlist",
+			Title:       "BIP39 Word List: All 2048 Words Grouped by Rhyme | Seed Poet",
+			Description: wordlistDesc,
+			OGTitle:     "The BIP39 word list, grouped by rhyme", OGDescription: wordlistDesc,
+			Canonical: Site + "/wordlist", JSONLD: wordlistLD(), InSitemap: true, Wordlist: wordlist()}),
 		base(Page{Template: "expired.html", File: "expired.html", Path: "/expired",
 			Title: "Poem expired | Seed Poet", Description: "This poem was removed for your safety. Generate a new one.",
 			OGTitle: ogTitle, OGDescription: ogDesc, Robots: "noindex, follow"}),
