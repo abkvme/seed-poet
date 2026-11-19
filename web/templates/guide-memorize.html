@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{template "head" .}}</head>
+<body>
+{{template "header" .}}
+<main id="main" class="prose guide">
+  <p class="hud">Seed<span>.</span>Poet <span>//</span> guide</p>
+  <h1>How to memorize a seed phrase, and when not to</h1>
+
+  <p>A seed phrase (recovery phrase, mnemonic) is the master key of a crypto wallet: 12 or 24 words from the <a href="{{.Base}}/wordlist">BIP39 word list</a>. Anyone who has the words has the money, and if every copy is lost, so is the money. This guide shows how to learn a phrase by heart, and argues that for most people memory should be a second copy, never the only one.</p>
+
+  <h2 id="short">The short answer</h2>
+  <ul>
+    <li><strong>Do</strong> learn your phrase if it helps you: a phrase you know is a phrase you can check against your backup, and a copy no burglar can find.</li>
+    <li><strong>Do not</strong> make memory the only backup. Memory fades, fails under stress and dies with you. Keep at least one written copy, ideally stamped in metal, somewhere safe.</li>
+    <li><strong>Never</strong> invent the words yourself. A phrase you chose is a phrase someone can guess. Let a generator with real randomness pick them, then learn what it gave you.</li>
+  </ul>
+
+  <h2 id="why-hard">Why a seed phrase is hard to remember</h2>
+  <p>Twelve random words have no story: "ritual absurd glance oven..." gives the mind nothing to hold. Order matters too, and BIP39 phrases end with a checksum word, so a wallet rejects a phrase with one word swapped or misplaced. Memory research is blunt about what happens to facts you do not revisit: the <a href="https://en.wikipedia.org/wiki/Forgetting_curve" rel="noopener">forgetting curve</a> drops steeply within days.</p>
+
+  <h2 id="how">How to memorize it</h2>
+  <ol>
+    <li><strong>Give it a shape.</strong> Rhyme, rhythm and images are what people have used to carry long texts for centuries. <a href="{{.Base}}/">Seed Poet</a> writes your phrase as rhyming couplets (verb, adjective, noun; the nouns of each couplet rhyme), so a line pulls the next one along. Without Seed Poet, link the words into an absurd scene or walk them through rooms of your home (the <a href="https://en.wikipedia.org/wiki/Method_of_loci" rel="noopener">method of loci</a>).</li>
+    <li><strong>Learn it in pieces.</strong> One couplet (6 words) at a time, then join them. Say the line numbers too: wallets ask for words in order.</li>
+    <li><strong>Test, do not reread.</strong> Recalling with the answer hidden works better than looking at it again. Seed Poet's <a href="{{.Base}}/about#drill">Drill</a> hides one word per line, then two, then all, entirely in your browser.</li>
+    <li><strong>Space the repeats.</strong> Recall it the next day, after three days, a week, a month, then a few times a year (<a href="https://en.wikipedia.org/wiki/Spaced_repetition" rel="noopener">spaced repetition</a>). Each recall is from memory only, checked against your written copy in private.</li>
+    <li><strong>Never rehearse on a device.</strong> Do not type the phrase into notes, chats, password managers or flashcard apps that sync. Rehearse in your head or on paper you destroy.</li>
+  </ol>
+
+  <h2 id="when-not">When not to rely on memory</h2>
+  <p>Here is the counter-view, and it is mostly right:</p>
+  <ul>
+    <li><strong>Memory decays.</strong> A phrase you are sure of today can lose a word or its order after a year without practice. One lost word can still be found by trying all 2048 candidates with recovery tools; a few lost words put the funds out of reach.</li>
+    <li><strong>Memory fails when you need it.</strong> Illness, an accident, age, stress or simply a long gap can take it. A backup you cannot reach in a crisis is not a backup.</li>
+    <li><strong>Memory cannot be inherited.</strong> If the phrase lives only in your head, your family cannot recover the funds after you. Plan who gets access, and how.</li>
+    <li><strong>"Brain wallets" lost real money.</strong> Early Bitcoin users turned a phrase they made up into a key. Researchers tried about 300 billion guesses and found that almost every such wallet they detected was emptied, usually within a day (<a href="https://fc16.ifca.ai/preproceedings/36_Vasek.pdf" rel="noopener">Vasek et al., The Bitcoin Brain Drain, 2016</a>; <a href="https://en.bitcoin.it/wiki/Brainwallet" rel="noopener">Bitcoin Wiki: Brainwallet</a>). That is a lesson about human-chosen phrases. A Seed Poet poem is picked by a cryptographic random source, not by you, but a poem is still a little weaker than a fully random phrase: see <a href="{{.Base}}/about#privacy">how strong it is</a>, and use 24 words for real value.</li>
+    <li><strong>Large amounts deserve more than one person's head.</strong> For real savings, consider a hardware wallet and a written copy in metal, which survives fire and water where paper does not (<a href="https://jlopp.github.io/metal-bitcoin-storage-reviews/" rel="noopener">Jameson Lopp's metal storage stress tests</a>).</li>
+  </ul>
+
+  <h2 id="passphrase">A middle way: write the words, remember the passphrase</h2>
+  <p>Many wallets support an optional BIP39 passphrase (sometimes called the 25th word, defined in <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki" rel="noopener">BIP39</a>). The 24 words go on paper or metal; the passphrase you keep in your head. Someone who finds the written words sees a different, empty wallet. The same warning applies in reverse: forget the passphrase and the written words no longer open your funds, so it needs its own safe backup for your heirs.</p>
+
+  <h2 id="checklist">Checklist</h2>
+  <ul>
+    <li>Words generated by real randomness, never chosen by you.</li>
+    <li>At least one written copy, stored safely; metal for large amounts.</li>
+    <li>Phrase never typed into a synced device or taken in a photo.</li>
+    <li>Memory, if you use it, refreshed on a schedule and checked against the copy.</li>
+    <li>Someone you trust knows how to find the backup if you cannot.</li>
+  </ul>
+
+  <div class="cta">
+    <a class="btn" href="{{.Base}}/?words=12"><span class="k">12</span> words</a>
+    <a class="btn" href="{{.Base}}/?words=24"><span class="k">24</span> words</a>
+  </div>
+</main>
+{{template "footer" .}}
+{{template "site-scripts" .}}
+</body>
+</html>

@@ -31,7 +31,7 @@ func do(h http.Handler, method, path string, hdr map[string]string) *httptest.Re
 
 func TestPagesHeadersAndSEO(t *testing.T) {
 	h := handler(t)
-	for _, path := range []string{"/", "/about", "/wordlist", "/expired"} {
+	for _, path := range []string{"/", "/about", "/wordlist", "/guide/memorize-seed-phrase", "/expired"} {
 		rec := do(h, http.MethodGet, path, nil)
 		if rec.Code != http.StatusOK {
 			t.Fatalf("%s: status %d", path, rec.Code)

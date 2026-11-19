@@ -217,7 +217,7 @@ def browser_suite(bt, tmp):
     for w in (320, 360, 412):
         pg = ctx.new_page()
         pg.set_viewport_size({"width": w, "height": 740})
-        for path in ("/", "/about", "/wordlist"):
+        for path in ("/", "/about", "/wordlist", "/guide/memorize-seed-phrase"):
             pg.goto(BASE + path)
             pg.wait_for_timeout(300)
             over = pg.evaluate("document.documentElement.scrollWidth - window.innerWidth")
@@ -231,6 +231,17 @@ def browser_suite(bt, tmp):
     check(len(listed) == 2048 and len(set(listed)) == 2048 and set(listed) == set(M.wordlist),
           f"{name}: /wordlist lists 2048 unique BIP39 words ({len(listed)}, {len(set(listed))} unique)")
     check(pg.get_attribute("link[rel=canonical]", "href") == "https://seedpoet.com/wordlist", f"{name}: /wordlist canonical")
+    pg.close()
+
+    # Memorize guide: static page, canonical, cites the counter-view, linked from the footer.
+    pg = ctx.new_page()
+    pg.goto(BASE + "/guide/memorize-seed-phrase")
+    check(pg.get_attribute("link[rel=canonical]", "href") == "https://seedpoet.com/guide/memorize-seed-phrase",
+          f"{name}: guide canonical")
+    check(pg.eval_on_selector("h1", "e => e.textContent").startswith("How to memorize a seed phrase"), f"{name}: guide h1")
+    check(pg.locator("#when-not").count() == 1 and pg.locator("a[href*='36_Vasek.pdf']").count() == 1,
+          f"{name}: guide has the counter-view with sources")
+    check(pg.locator(".site-footer a[href='/guide/memorize-seed-phrase']").count() == 1, f"{name}: guide in footer")
     pg.close()
     ctx.close()
 
