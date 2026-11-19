@@ -38,7 +38,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/site.f20664b7a8.css" integrity="sha384-bKSHoNoFDDZFG3ko3I&#43;jrEs//f7dBJNuD9TlZRC6YCsDUt0axlgky5FN2iXWBhSS">
+<link rel="stylesheet" href="/assets/site.f882ddd009.css" integrity="sha384-izeUW/NIDQRx&#43;tqUtnrqCTflHyHBrxTtWjVI9XVevyZ1dbJcBllqQoiMyoBQdF7Z">
 <link rel="author" href="/about">
 <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@id":"https://seedpoet.com/about#page","@type":"AboutPage","about":{"@id":"https://seedpoet.com/#app"},"description":"How Seed Poet turns a BIP39 seed phrase into a rhyming poem, how strong it is, and how it protects your privacy.","inLanguage":"en","isPartOf":{"@id":"https://seedpoet.com/#website"},"name":"About Seed Poet","url":"https://seedpoet.com/about"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://seedpoet.com/","name":"Seed Poet","position":1},{"@type":"ListItem","item":"https://seedpoet.com/about","name":"About","position":2}]}]}</script>
@@ -91,6 +91,9 @@
     <li>A 12-word poem holds about 88 bits of randomness and a 24-word poem about 176, because rhymes limit word choice. For a wallet with real value, use 24 words and the <a href="/seedpoet-offline.html" download>offline version</a>.</li>
   </ul>
 
+  <h2 id="drill">Drill: learn your poem</h2>
+  <p>Under a new poem, press Drill. Seed Poet hides one word per line and you type it back; after a perfect round it hides two words per line, then every word. Wrong answers are shown in red with the right word. The quiz runs only in your browser: what you type is never stored or sent, autocomplete and spellcheck are off for those fields, and it is wiped together with the poem. Rhyme and rhythm make a poem easier to recall than a list, but treat memory as a second copy, never the only one: keep the paper backup.</p>
+
   <h2 id="ssh">Also for SSH keys</h2>
   <p>A poem is a valid BIP39 phrase, so it can back up more than a wallet. <a href="https://oxisoft.io/open-source/mnemossh/">MnemoSSH</a>, an open-source tool from the same team, turns a BIP39 phrase into an Ed25519 SSH key. Run <code>mnemossh restore</code> with the words of your poem and you get the same key back on any machine.</p>
 
@@ -109,7 +112,7 @@
     <a href="/wordlist">BIP39 word list</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
     <a href="/seedpoet-offline.html" download>Offline version</a>
-    <span>v2.1.7</span>
+    <span>v2.1.8</span>
   </nav>
 </footer>
 <script src="/assets/site.8bce1e819a.js" integrity="sha384-xiZQgrBaaD6MtDyg2utRsIkGRQCaCKykarYEiUH/lqrd8PwF7SvZibePV4Z1TA4B" defer></script>

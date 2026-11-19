@@ -38,10 +38,10 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/assets/site.f20664b7a8.css" integrity="sha384-bKSHoNoFDDZFG3ko3I&#43;jrEs//f7dBJNuD9TlZRC6YCsDUt0axlgky5FN2iXWBhSS">
+<link rel="stylesheet" href="/assets/site.f882ddd009.css" integrity="sha384-izeUW/NIDQRx&#43;tqUtnrqCTflHyHBrxTtWjVI9XVevyZ1dbJcBllqQoiMyoBQdF7Z">
 <link rel="author" href="/about">
 <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@id":"https://seedpoet.com/#website","@type":"WebSite","description":"A valid 12 or 24-word BIP39 seed phrase for Bitcoin, Ethereum, Solana or Cardano, written as a rhyming poem. Made in your browser, never sent or stored.","inLanguage":"en","name":"Seed Poet","publisher":{"@id":"https://oxisoft.io/#organization"},"url":"https://seedpoet.com/"},{"@id":"https://oxisoft.io/#organization","@type":"Organization","name":"OxiSoft","url":"https://oxisoft.io"},{"@id":"https://seedpoet.com/#app","@type":"WebApplication","applicationCategory":"SecurityApplication","applicationSubCategory":"BIP39 seed phrase generator","author":{"@id":"https://oxisoft.io/#organization"},"browserRequirements":"Requires JavaScript; a server fallback works without it","description":"A valid 12 or 24-word BIP39 seed phrase for Bitcoin, Ethereum, Solana or Cardano, written as a rhyming poem. Made in your browser, never sent or stored.","featureList":["Valid BIP39 mnemonic with checksum, 12 or 24 words","Rhyming couplets for easier memorising","Generated on your device with a secure random source","Nothing sent or stored; auto-hide after 15 minutes","Printable PDF made in the browser","Works offline and installs as an app","Works with Bitcoin, Ethereum and EVM chains, Solana, Cardano, Polkadot, Cosmos, Tron, Litecoin, Dogecoin and any BIP39 wallet"],"image":"https://seedpoet.com/og.png","isAccessibleForFree":true,"keywords":"BIP39 generator, seed phrase generator, mnemonic generator, recovery phrase, Bitcoin seed phrase, Ethereum seed phrase, Solana seed phrase, Cardano seed phrase, crypto wallet, rhyming seed phrase, offline seed generator","name":"Seed Poet","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"operatingSystem":"Any (web browser)","publisher":{"@id":"https://oxisoft.io/#organization"},"sameAs":["https://github.com/abkvme/seed-poet"],"screenshot":"https://seedpoet.com/screenshots/wide.png","softwareVersion":"2.1.7","url":"https://seedpoet.com/"},{"@id":"https://github.com/abkvme/seed-poet","@type":"SoftwareSourceCode","author":{"@id":"https://oxisoft.io/#organization"},"codeRepository":"https://github.com/abkvme/seed-poet","license":"https://opensource.org/licenses/MIT","name":"seed-poet","programmingLanguage":["Go","JavaScript"]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@id":"https://seedpoet.com/#website","@type":"WebSite","description":"A valid 12 or 24-word BIP39 seed phrase for Bitcoin, Ethereum, Solana or Cardano, written as a rhyming poem. Made in your browser, never sent or stored.","inLanguage":"en","name":"Seed Poet","publisher":{"@id":"https://oxisoft.io/#organization"},"url":"https://seedpoet.com/"},{"@id":"https://oxisoft.io/#organization","@type":"Organization","name":"OxiSoft","url":"https://oxisoft.io"},{"@id":"https://seedpoet.com/#app","@type":"WebApplication","applicationCategory":"SecurityApplication","applicationSubCategory":"BIP39 seed phrase generator","author":{"@id":"https://oxisoft.io/#organization"},"browserRequirements":"Requires JavaScript; a server fallback works without it","description":"A valid 12 or 24-word BIP39 seed phrase for Bitcoin, Ethereum, Solana or Cardano, written as a rhyming poem. Made in your browser, never sent or stored.","featureList":["Valid BIP39 mnemonic with checksum, 12 or 24 words","Rhyming couplets for easier memorising","Generated on your device with a secure random source","Nothing sent or stored; auto-hide after 15 minutes","Printable PDF made in the browser","Works offline and installs as an app","Works with Bitcoin, Ethereum and EVM chains, Solana, Cardano, Polkadot, Cosmos, Tron, Litecoin, Dogecoin and any BIP39 wallet"],"image":"https://seedpoet.com/og.png","isAccessibleForFree":true,"keywords":"BIP39 generator, seed phrase generator, mnemonic generator, recovery phrase, Bitcoin seed phrase, Ethereum seed phrase, Solana seed phrase, Cardano seed phrase, crypto wallet, rhyming seed phrase, offline seed generator","name":"Seed Poet","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"operatingSystem":"Any (web browser)","publisher":{"@id":"https://oxisoft.io/#organization"},"sameAs":["https://github.com/abkvme/seed-poet"],"screenshot":"https://seedpoet.com/screenshots/wide.png","softwareVersion":"2.1.8","url":"https://seedpoet.com/"},{"@id":"https://github.com/abkvme/seed-poet","@type":"SoftwareSourceCode","author":{"@id":"https://oxisoft.io/#organization"},"codeRepository":"https://github.com/abkvme/seed-poet","license":"https://opensource.org/licenses/MIT","name":"seed-poet","programmingLanguage":["Go","JavaScript"]}]}</script>
 </head>
 <body class="one-screen">
 <a class="skip" href="#main">Skip to content</a>
@@ -112,7 +112,9 @@
         <div class="actions" id="actions" hidden>
           <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
           <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
-          <button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>
+          <button class="btn small ghost" id="drill-btn" type="button" aria-pressed="false" title="Quiz yourself on this poem, offline" hidden>Drill</button>
+          <button class="btn small" id="check-btn" type="button" hidden>Check</button>
+                    <button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>
         </div>
         <details class="numbered" id="numbered" hidden>
           <summary>Numbered words, in wallet order</summary>
@@ -132,13 +134,14 @@
     <a href="/wordlist">BIP39 word list</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
     <a href="/seedpoet-offline.html" download>Offline version</a>
-    <span>v2.1.7</span>
+    <span>v2.1.8</span>
   </nav>
 </footer>
 <script src="/assets/data.6d82e27841.js" integrity="sha384-SQQ7/I8zl7JwAKFksVNkrOYKFH2NPL6Phqcht8LD5gRDdzns9giwsZO4/SkvUY59" defer></script>
-<script src="/assets/seedpoet.452efc3d98.js" integrity="sha384-G7OpRoHNltPgq2QQiM9nsLpnWWdCUQCnANG0WRK7qBT3EAOJHAoPYuktyNZ2imkx" defer></script>
+<script src="/assets/seedpoet.b1cc14566e.js" integrity="sha384-c25PsrYFHzATO5Q177RW/J1/y9CzmT1iJKzrhnsErvW2Xj5ikMSmMqpmQpv8wEgO" defer></script>
 <script src="/assets/pdf.3b53484cde.js" integrity="sha384-vQwK27xOJUP5WORLBFv1TXYoutKR1XSk6gRVWq3ChKA3i0uLHBThpVz2r0APhem/" defer></script>
-<script src="/assets/app.94382dfcaf.js" integrity="sha384-rjKFSXMtbGB78qzDuZIK/6RGqFVpmlAwfYhj6pw0RV0QEZ9zDu1OR48Qw2SsvwDJ" defer></script>
+<script src="/assets/drill.d5a4dfcecd.js" integrity="sha384-5UymWT6Saq7BtS8wte8hY5YEkWfNaoUZaSgSQMm6LfxoQTvDYv&#43;p9Q6W/Y7CZmE5" defer></script>
+<script src="/assets/app.e2322b4be5.js" integrity="sha384-USn1Ea1/LdJHDL0vaB43VLu4wVgNsT6ph2uyrmdFd7diTx9XyNVQ5R2qMtgA1GMB" defer></script>
 <script src="/assets/site.8bce1e819a.js" integrity="sha384-xiZQgrBaaD6MtDyg2utRsIkGRQCaCKykarYEiUH/lqrd8PwF7SvZibePV4Z1TA4B" defer></script>
 </body>
 </html>

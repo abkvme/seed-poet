@@ -20,6 +20,9 @@
   var copyBtn = $('copy-btn');
   var pdfBtn = $('pdf-btn');
   var hideBtn = $('hide-btn');
+  var drillBtn = $('drill-btn');
+  var checkBtn = $('check-btn');
+  var Drill = window.SeedPoetDrill;
   var wordsLabel = $('words-label');
   var pickers = document.querySelectorAll('[data-generate]');
 
@@ -29,6 +32,9 @@
   var expiresAt = 0;
   var ticker = 0;
   var gen = null;
+  // Drill state, in memory only and wiped with the poem: level (words hidden per
+  // line), hidden word positions, the input elements and whether the round is graded.
+  var drill = null;
 
   function clear(el) {
     while (el.firstChild) el.removeChild(el.firstChild);
@@ -68,7 +74,112 @@
     });
   }
 
+  function setDrillUI(on) {
+    if (!drillBtn) return;
+    drillBtn.textContent = on ? 'Show poem' : 'Drill';
+    drillBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    checkBtn.hidden = !on;
+    checkBtn.textContent = 'Check';
+    if (current) {
+      copyBtn.hidden = on || !(navigator.clipboard && navigator.clipboard.writeText);
+      pdfBtn.hidden = on || !window.SeedPoetPDF;
+      numbered.hidden = on;
+      if (on) numbered.open = false;
+    }
+  }
+
+  function drillRound() {
+    drill.hidden = Drill.blanks(current, drill.level);
+    drill.inputs = [];
+    drill.graded = false;
+    clear(lines);
+    current.forEach(function (line, i) {
+      var li = document.createElement('li');
+      var ln = document.createElement('span');
+      ln.className = 'ln';
+      ln.textContent = (i < 9 ? '0' : '') + (i + 1);
+      li.appendChild(ln);
+      var row = [];
+      line.forEach(function (w, k) {
+        if (k) li.appendChild(document.createTextNode(' '));
+        if (drill.hidden[i].indexOf(k) < 0) {
+          var sp = document.createElement('span');
+          if (k === 2) sp.className = 'rhyme';
+          sp.textContent = w;
+          li.appendChild(sp);
+          return;
+        }
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'drill-word' + (k === 2 ? ' rhyme' : '');
+        inp.size = 8;
+        inp.maxLength = 8;
+        inp.setAttribute('autocomplete', 'off');
+        inp.setAttribute('autocapitalize', 'none');
+        inp.setAttribute('autocorrect', 'off');
+        inp.setAttribute('spellcheck', 'false');
+        inp.setAttribute('aria-label', 'Line ' + (i + 1) + ', word ' + (k + 1));
+        li.appendChild(inp);
+        row.push(inp);
+      });
+      drill.inputs.push(row);
+      lines.appendChild(li);
+    });
+    var all = [].concat.apply([], drill.inputs);
+    all.forEach(function (inp, n) {
+      inp.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        if (n + 1 < all.length) all[n + 1].focus(); else drillCheck();
+      });
+    });
+    var per = drill.level === Drill.MAX_LEVEL ? 'every word' : drill.level + (drill.level === 1 ? ' word' : ' words') + ' per line';
+    setStatus('Drill, round ' + drill.level + ' of ' + Drill.MAX_LEVEL + ': type the missing words (' + per + '). Nothing is stored.', false);
+    checkBtn.textContent = 'Check';
+    if (all.length) all[0].focus();
+  }
+
+  function drillCheck() {
+    if (!drill || !current) return;
+    if (drill.graded) { drillRound(); return; }
+    var answers = drill.inputs.map(function (row) { return row.map(function (inp) { return inp.value; }); });
+    var res = Drill.grade(current, drill.hidden, answers);
+    answers = null;
+    drill.inputs.forEach(function (row, i) {
+      row.forEach(function (inp, k) {
+        inp.readOnly = true;
+        if (res.ok[i][k]) {
+          inp.classList.add('good');
+        } else {
+          inp.classList.add('bad');
+          inp.value = current[i][drill.hidden[i][k]];
+        }
+      });
+    });
+    drill.graded = true;
+    var lvl = Drill.next(drill.level, res);
+    var msg = res.right + ' of ' + res.total + ' right. ';
+    if (res.right === res.total && drill.level === Drill.MAX_LEVEL) msg += 'You know the whole poem by heart.';
+    else if (lvl > drill.level) msg += 'Next round hides more words.';
+    else msg += 'The right words are shown in red: try again.';
+    drill.level = lvl;
+    setStatus(msg, res.right !== res.total);
+    checkBtn.textContent = 'Next round';
+    checkBtn.focus();
+  }
+
+  function drillStop() {
+    drill = null;
+    setDrillUI(false);
+    if (current) {
+      render(current);
+      setStatus('Drill closed. Nothing you typed was kept.', false);
+    }
+  }
+
   function wipe(message) {
+    drill = null;
+    setDrillUI(false);
     current = null;
     expiresAt = 0;
     if (ticker) { clearInterval(ticker); ticker = 0; }
@@ -110,6 +221,9 @@
     copyBtn.hidden = !(navigator.clipboard && navigator.clipboard.writeText);
     hideBtn.classList.remove('attention');
     hideBtn.textContent = 'I saved it, hide now';
+    drill = null;
+    setDrillUI(false);
+    if (drillBtn) drillBtn.hidden = !Drill;
     markPicker();
     setStatus('Generated on this device. Nothing was sent or stored.', false);
     tick();
@@ -157,8 +271,19 @@
     wipe('Poem hidden. It was never stored and cannot be shown again.');
   });
 
+  if (drillBtn) {
+    drillBtn.addEventListener('click', function () {
+      if (!current || !Drill) return;
+      if (drill) { drillStop(); return; }
+      drill = { level: 1 };
+      setDrillUI(true);
+      drillRound();
+    });
+    checkBtn.addEventListener('click', drillCheck);
+  }
+
   copyBtn.addEventListener('click', function () {
-    if (!current) return;
+    if (!current || drill) return;
     navigator.clipboard.writeText(text()).then(function () {
       copyBtn.textContent = 'Copied';
       setTimeout(function () { copyBtn.textContent = 'Copy'; }, 2000);
@@ -167,7 +292,7 @@
   });
 
   pdfBtn.addEventListener('click', function () {
-    if (!current || !window.SeedPoetPDF) return;
+    if (!current || drill || !window.SeedPoetPDF) return;
     var url = URL.createObjectURL(window.SeedPoetPDF.build(current.map(function (l) { return l.join(' '); })));
     var a = document.createElement('a');
     a.href = url;

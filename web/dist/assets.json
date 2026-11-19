@@ -1,23 +1,27 @@
 {
   "css/site.css": {
-    "path": "/assets/site.f20664b7a8.css",
-    "sri": "sha384-bKSHoNoFDDZFG3ko3I+jrEs//f7dBJNuD9TlZRC6YCsDUt0axlgky5FN2iXWBhSS"
+    "path": "/assets/site.f882ddd009.css",
+    "sri": "sha384-izeUW/NIDQRx+tqUtnrqCTflHyHBrxTtWjVI9XVevyZ1dbJcBllqQoiMyoBQdF7Z"
   },
   "js/app.js": {
-    "path": "/assets/app.94382dfcaf.js",
-    "sri": "sha384-rjKFSXMtbGB78qzDuZIK/6RGqFVpmlAwfYhj6pw0RV0QEZ9zDu1OR48Qw2SsvwDJ"
+    "path": "/assets/app.e2322b4be5.js",
+    "sri": "sha384-USn1Ea1/LdJHDL0vaB43VLu4wVgNsT6ph2uyrmdFd7diTx9XyNVQ5R2qMtgA1GMB"
   },
   "js/data.js": {
     "path": "/assets/data.6d82e27841.js",
     "sri": "sha384-SQQ7/I8zl7JwAKFksVNkrOYKFH2NPL6Phqcht8LD5gRDdzns9giwsZO4/SkvUY59"
+  },
+  "js/drill.js": {
+    "path": "/assets/drill.d5a4dfcecd.js",
+    "sri": "sha384-5UymWT6Saq7BtS8wte8hY5YEkWfNaoUZaSgSQMm6LfxoQTvDYv+p9Q6W/Y7CZmE5"
   },
   "js/pdf.js": {
     "path": "/assets/pdf.3b53484cde.js",
     "sri": "sha384-vQwK27xOJUP5WORLBFv1TXYoutKR1XSk6gRVWq3ChKA3i0uLHBThpVz2r0APhem/"
   },
   "js/seedpoet.js": {
-    "path": "/assets/seedpoet.452efc3d98.js",
-    "sri": "sha384-G7OpRoHNltPgq2QQiM9nsLpnWWdCUQCnANG0WRK7qBT3EAOJHAoPYuktyNZ2imkx"
+    "path": "/assets/seedpoet.b1cc14566e.js",
+    "sri": "sha384-c25PsrYFHzATO5Q177RW/J1/y9CzmT1iJKzrhnsErvW2Xj5ikMSmMqpmQpv8wEgO"
   },
   "js/site.js": {
     "path": "/assets/site.8bce1e819a.js",

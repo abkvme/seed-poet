@@ -43,6 +43,7 @@ func main() {
 		"js/app.js":      read("web/static/js/app.js"),
 		"js/site.js":     read("web/static/js/site.js"),
 		"js/pdf.js":      read("web/static/js/pdf.js"),
+		"js/drill.js":    read("web/static/js/drill.js"),
 		"js/seedpoet.js": read("js/seedpoet.js"),
 		"js/data.js":     dataJS(),
 	}

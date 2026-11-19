@@ -80,11 +80,13 @@
 {{define "poem-scripts"}}{{if .Offline}}<script>{{inlineJS "js/data.js"}}</script>
 <script>{{inlineJS "js/seedpoet.js"}}</script>
 <script>{{inlineJS "js/pdf.js"}}</script>
+<script>{{inlineJS "js/drill.js"}}</script>
 <script>{{inlineJS "js/app.js"}}</script>
 <script>{{inlineJS "js/site.js"}}</script>
 {{else}}<script src="{{asset "js/data.js"}}" integrity="{{sri "js/data.js"}}" defer></script>
 <script src="{{asset "js/seedpoet.js"}}" integrity="{{sri "js/seedpoet.js"}}" defer></script>
 <script src="{{asset "js/pdf.js"}}" integrity="{{sri "js/pdf.js"}}" defer></script>
+<script src="{{asset "js/drill.js"}}" integrity="{{sri "js/drill.js"}}" defer></script>
 <script src="{{asset "js/app.js"}}" integrity="{{sri "js/app.js"}}" defer></script>
 <script src="{{asset "js/site.js"}}" integrity="{{sri "js/site.js"}}" defer></script>
 {{end}}{{end}}
@@ -137,7 +139,9 @@
         <div class="actions" id="actions"{{if not .Poem}} hidden{{end}}>
           <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
           <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
-          {{if .Poem}}<a class="btn small warn" id="hide-btn" href="/expired">I saved it, hide now</a>{{else}}<button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>{{end}}
+          {{if not .Poem}}<button class="btn small ghost" id="drill-btn" type="button" aria-pressed="false" title="Quiz yourself on this poem, offline" hidden>Drill</button>
+          <button class="btn small" id="check-btn" type="button" hidden>Check</button>
+          {{end}}          {{if .Poem}}<a class="btn small warn" id="hide-btn" href="/expired">I saved it, hide now</a>{{else}}<button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>{{end}}
         </div>
         <details class="numbered" id="numbered"{{if not .Poem}} hidden{{end}}>
           <summary>Numbered words, in wallet order</summary>

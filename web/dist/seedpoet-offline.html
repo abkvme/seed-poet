@@ -529,6 +529,40 @@ main {
   text-shadow: 0 0 8px rgba(0, 255, 156, 0.45);
 }
 
+/* Drill mode: hidden words become inputs inside the poem line (same height). */
+.poem-lines .drill-word {
+  width: 8.5ch;
+  margin: 0;
+  padding: 0 0.15rem;
+  border: 0;
+  border-bottom: 1px solid var(--muted);
+  border-radius: 0;
+  background: rgba(0, 255, 156, 0.06);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.poem-lines .drill-word.rhyme {
+  color: var(--green);
+}
+
+.poem-lines .drill-word:focus {
+  outline: 1px solid var(--green);
+  outline-offset: 1px;
+}
+
+.poem-lines .drill-word.good {
+  border-bottom-color: var(--green);
+  color: var(--green);
+}
+
+.poem-lines .drill-word.bad {
+  border-bottom-color: var(--danger);
+  color: var(--danger);
+}
+
 .poem-status {
   min-height: 1.5em;
   margin: 0.6rem 0 0;
@@ -1148,7 +1182,9 @@ main > .chains a {
         <div class="actions" id="actions" hidden>
           <button class="btn small ghost" id="copy-btn" type="button" hidden>Copy</button>
           <button class="btn small ghost" id="pdf-btn" type="button" hidden>Download PDF</button>
-          <button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>
+          <button class="btn small ghost" id="drill-btn" type="button" aria-pressed="false" title="Quiz yourself on this poem, offline" hidden>Drill</button>
+          <button class="btn small" id="check-btn" type="button" hidden>Check</button>
+                    <button class="btn small warn" id="hide-btn" type="button">I saved it, hide now</button>
         </div>
         <details class="numbered" id="numbered" hidden>
           <summary>Numbered words, in wallet order</summary>
@@ -1167,7 +1203,7 @@ main > .chains a {
     <a href="https://seedpoet.com/about#privacy">Privacy</a>
     <a href="https://seedpoet.com/wordlist">BIP39 word list</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
-    <span>v2.1.7</span>
+    <span>v2.1.8</span>
   </nav>
 </footer>
 <script>/*! Seed Poet word data (BIP39 English + categories + rhymes), generated from data/ */
@@ -1557,7 +1593,7 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   }
 
   return {
-    version: '2.1.7',
+    version: '2.1.8',
     createGenerator: createGenerator,
     normalizeData: normalizeData,
     cryptoRNG: cryptoRNG,
@@ -1687,6 +1723,69 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   window.SeedPoetPDF = { build: buildPoemPDF };
 })();
 </script>
+<script>// Seed Poet drill: an offline quiz on the poem shown on this page. Pure logic, no
+// DOM, no storage, no network: app.js keeps the quiz in memory and wipes it with the
+// poem. Rounds blank 1, then 2, then all 3 words of every line ("by heart").
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.SeedPoetDrill = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var MAX_LEVEL = 3;
+
+  // randInt(n) returns an integer in [0, n). Defaults to crypto.getRandomValues.
+  function cryptoInt(n) {
+    var c = (typeof globalThis !== 'undefined' && globalThis.crypto) || null;
+    if (!c || !c.getRandomValues) throw new Error('crypto.getRandomValues is not available');
+    var buf = new Uint32Array(1);
+    var limit = Math.floor(0x100000000 / n) * n;
+    do { c.getRandomValues(buf); } while (buf[0] >= limit);
+    return buf[0] % n;
+  }
+
+  // blanks picks `level` word positions per line (1..3) and returns, per line,
+  // a sorted array of the hidden word indexes.
+  function blanks(lines, level, randInt) {
+    randInt = randInt || cryptoInt;
+    level = Math.max(1, Math.min(MAX_LEVEL, level | 0));
+    return lines.map(function (line) {
+      var idx = line.map(function (_, i) { return i; });
+      for (var i = idx.length - 1; i > 0; i--) {
+        var j = randInt(i + 1);
+        var t = idx[i]; idx[i] = idx[j]; idx[j] = t;
+      }
+      return idx.slice(0, Math.min(level, line.length)).sort(function (a, b) { return a - b; });
+    });
+  }
+
+  function normalize(s) {
+    return String(s == null ? '' : s).trim().toLowerCase();
+  }
+
+  // grade compares answers (same shape as the blanks: per line, one string per
+  // hidden word) with the poem. Returns {right, total, ok} where ok mirrors answers.
+  function grade(lines, hidden, answers) {
+    var right = 0, total = 0;
+    var ok = hidden.map(function (pos, li) {
+      return pos.map(function (wi, k) {
+        total++;
+        var good = normalize(answers[li] && answers[li][k]) === lines[li][wi];
+        if (good) right++;
+        return good;
+      });
+    });
+    return { right: right, total: total, ok: ok };
+  }
+
+  // next is the level after a graded round: up after a perfect round, else the same.
+  function next(level, result) {
+    return result.right === result.total ? Math.min(MAX_LEVEL, level + 1) : level;
+  }
+
+  return { MAX_LEVEL: MAX_LEVEL, blanks: blanks, normalize: normalize, grade: grade, next: next };
+});
+</script>
 <script>// Seed Poet page logic. The poem is generated right here, in this page, by the
 // Seed Poet library with crypto.getRandomValues. It is never sent anywhere (the
 // site's Content-Security-Policy has connect-src 'none'), never stored, and it is
@@ -1709,6 +1808,9 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   var copyBtn = $('copy-btn');
   var pdfBtn = $('pdf-btn');
   var hideBtn = $('hide-btn');
+  var drillBtn = $('drill-btn');
+  var checkBtn = $('check-btn');
+  var Drill = window.SeedPoetDrill;
   var wordsLabel = $('words-label');
   var pickers = document.querySelectorAll('[data-generate]');
 
@@ -1718,6 +1820,9 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   var expiresAt = 0;
   var ticker = 0;
   var gen = null;
+  // Drill state, in memory only and wiped with the poem: level (words hidden per
+  // line), hidden word positions, the input elements and whether the round is graded.
+  var drill = null;
 
   function clear(el) {
     while (el.firstChild) el.removeChild(el.firstChild);
@@ -1757,7 +1862,112 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
     });
   }
 
+  function setDrillUI(on) {
+    if (!drillBtn) return;
+    drillBtn.textContent = on ? 'Show poem' : 'Drill';
+    drillBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    checkBtn.hidden = !on;
+    checkBtn.textContent = 'Check';
+    if (current) {
+      copyBtn.hidden = on || !(navigator.clipboard && navigator.clipboard.writeText);
+      pdfBtn.hidden = on || !window.SeedPoetPDF;
+      numbered.hidden = on;
+      if (on) numbered.open = false;
+    }
+  }
+
+  function drillRound() {
+    drill.hidden = Drill.blanks(current, drill.level);
+    drill.inputs = [];
+    drill.graded = false;
+    clear(lines);
+    current.forEach(function (line, i) {
+      var li = document.createElement('li');
+      var ln = document.createElement('span');
+      ln.className = 'ln';
+      ln.textContent = (i < 9 ? '0' : '') + (i + 1);
+      li.appendChild(ln);
+      var row = [];
+      line.forEach(function (w, k) {
+        if (k) li.appendChild(document.createTextNode(' '));
+        if (drill.hidden[i].indexOf(k) < 0) {
+          var sp = document.createElement('span');
+          if (k === 2) sp.className = 'rhyme';
+          sp.textContent = w;
+          li.appendChild(sp);
+          return;
+        }
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'drill-word' + (k === 2 ? ' rhyme' : '');
+        inp.size = 8;
+        inp.maxLength = 8;
+        inp.setAttribute('autocomplete', 'off');
+        inp.setAttribute('autocapitalize', 'none');
+        inp.setAttribute('autocorrect', 'off');
+        inp.setAttribute('spellcheck', 'false');
+        inp.setAttribute('aria-label', 'Line ' + (i + 1) + ', word ' + (k + 1));
+        li.appendChild(inp);
+        row.push(inp);
+      });
+      drill.inputs.push(row);
+      lines.appendChild(li);
+    });
+    var all = [].concat.apply([], drill.inputs);
+    all.forEach(function (inp, n) {
+      inp.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        if (n + 1 < all.length) all[n + 1].focus(); else drillCheck();
+      });
+    });
+    var per = drill.level === Drill.MAX_LEVEL ? 'every word' : drill.level + (drill.level === 1 ? ' word' : ' words') + ' per line';
+    setStatus('Drill, round ' + drill.level + ' of ' + Drill.MAX_LEVEL + ': type the missing words (' + per + '). Nothing is stored.', false);
+    checkBtn.textContent = 'Check';
+    if (all.length) all[0].focus();
+  }
+
+  function drillCheck() {
+    if (!drill || !current) return;
+    if (drill.graded) { drillRound(); return; }
+    var answers = drill.inputs.map(function (row) { return row.map(function (inp) { return inp.value; }); });
+    var res = Drill.grade(current, drill.hidden, answers);
+    answers = null;
+    drill.inputs.forEach(function (row, i) {
+      row.forEach(function (inp, k) {
+        inp.readOnly = true;
+        if (res.ok[i][k]) {
+          inp.classList.add('good');
+        } else {
+          inp.classList.add('bad');
+          inp.value = current[i][drill.hidden[i][k]];
+        }
+      });
+    });
+    drill.graded = true;
+    var lvl = Drill.next(drill.level, res);
+    var msg = res.right + ' of ' + res.total + ' right. ';
+    if (res.right === res.total && drill.level === Drill.MAX_LEVEL) msg += 'You know the whole poem by heart.';
+    else if (lvl > drill.level) msg += 'Next round hides more words.';
+    else msg += 'The right words are shown in red: try again.';
+    drill.level = lvl;
+    setStatus(msg, res.right !== res.total);
+    checkBtn.textContent = 'Next round';
+    checkBtn.focus();
+  }
+
+  function drillStop() {
+    drill = null;
+    setDrillUI(false);
+    if (current) {
+      render(current);
+      setStatus('Drill closed. Nothing you typed was kept.', false);
+    }
+  }
+
   function wipe(message) {
+    drill = null;
+    setDrillUI(false);
     current = null;
     expiresAt = 0;
     if (ticker) { clearInterval(ticker); ticker = 0; }
@@ -1799,6 +2009,9 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
     copyBtn.hidden = !(navigator.clipboard && navigator.clipboard.writeText);
     hideBtn.classList.remove('attention');
     hideBtn.textContent = 'I saved it, hide now';
+    drill = null;
+    setDrillUI(false);
+    if (drillBtn) drillBtn.hidden = !Drill;
     markPicker();
     setStatus('Generated on this device. Nothing was sent or stored.', false);
     tick();
@@ -1846,8 +2059,19 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
     wipe('Poem hidden. It was never stored and cannot be shown again.');
   });
 
+  if (drillBtn) {
+    drillBtn.addEventListener('click', function () {
+      if (!current || !Drill) return;
+      if (drill) { drillStop(); return; }
+      drill = { level: 1 };
+      setDrillUI(true);
+      drillRound();
+    });
+    checkBtn.addEventListener('click', drillCheck);
+  }
+
   copyBtn.addEventListener('click', function () {
-    if (!current) return;
+    if (!current || drill) return;
     navigator.clipboard.writeText(text()).then(function () {
       copyBtn.textContent = 'Copied';
       setTimeout(function () { copyBtn.textContent = 'Copy'; }, 2000);
@@ -1856,7 +2080,7 @@ globalThis.SeedPoetData={"adjectives":[2,5,7,8,16,23,33,36,41,50,51,55,62,68,71,
   });
 
   pdfBtn.addEventListener('click', function () {
-    if (!current || !window.SeedPoetPDF) return;
+    if (!current || drill || !window.SeedPoetPDF) return;
     var url = URL.createObjectURL(window.SeedPoetPDF.build(current.map(function (l) { return l.join(' '); })));
     var a = document.createElement('a');
     a.href = url;

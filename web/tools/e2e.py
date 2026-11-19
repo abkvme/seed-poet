@@ -111,6 +111,53 @@ def browser_suite(bt, tmp):
     page.click("#hide-btn")
     check(poem_words(page) == [] and not page.is_visible("#timer"), f"{name}: hide now wipes the poem")
 
+    # Drill: an offline quiz on the poem, in memory only, wiped with the poem.
+    page.click("[data-generate='12']")
+    w12 = wait_poem(page, 12)
+    page.click("#drill-btn")
+    page.wait_for_timeout(150)
+
+    def drill_fill(wrong=0):
+        labels = page.eval_on_selector_all("#poem-lines input.drill-word", "els => els.map(e => e.getAttribute('aria-label'))")
+        for n, lab in enumerate(labels):
+            i, k = map(int, re.findall(r"\d+", lab))
+            page.fill(f"#poem-lines input[aria-label='{lab}']", "nope" if n < wrong else w12[(i - 1) * 3 + k - 1].upper())
+        return len(labels)
+
+    attrs = page.eval_on_selector_all("#poem-lines input.drill-word",
+                                      "els => els.map(e => e.autocomplete + e.spellcheck + e.getAttribute('autocapitalize'))")
+    check(len(attrs) == 4 and set(attrs) == {"offfalsenone"}, f"{name}: drill round 1 hides 1 word per line, no autocomplete/spellcheck {attrs}")
+    check(not page.is_visible("#copy-btn") and not page.is_visible("#pdf-btn") and not page.is_visible("#numbered"),
+          f"{name}: drill hides copy, PDF and the numbered list")
+    drill_fill()
+    page.click("#check-btn")
+    check("4 of 4 right" in page.inner_text("#poem-status"), f"{name}: drill grades a perfect round ({page.inner_text('#poem-status')})")
+    page.click("#check-btn")
+    page.wait_for_timeout(100)
+    check(drill_fill(wrong=1) == 8, f"{name}: drill round 2 hides 2 words per line")
+    page.click("#check-btn")
+    bad = page.eval_on_selector_all("#poem-lines input.bad", "els => els.map(e => e.value)")
+    check("7 of 8 right" in page.inner_text("#poem-status") and len(bad) == 1 and bad[0] in w12,
+          f"{name}: drill marks the wrong word and shows the right one")
+    page.click("#drill-btn")
+    check(page.eval_on_selector_all("#poem-lines input", "e => e.length") == 0 and page.is_visible("#copy-btn")
+          and all(wd in page.inner_text("#poem-lines") for wd in w12), f"{name}: Show poem leaves the drill")
+    page.click("#drill-btn")
+    page.fill("#poem-lines input.drill-word >> nth=0", "typed")
+    page.click("#hide-btn")
+    check(page.eval_on_selector("#poem-lines", "e => e.textContent + e.querySelectorAll('input').length") == "0"
+          and not page.is_visible("#drill-btn") and not page.is_visible("#check-btn"), f"{name}: hide now wipes the drill")
+    page.click("[data-generate='12']")
+    wait_poem(page, 12)
+    page.click("#drill-btn")
+    page.evaluate("window.__off = 15*60*1000 + 1000")
+    page.wait_for_timeout(1300)
+    page.evaluate("window.__off = 0")
+    check(page.eval_on_selector("#poem-lines", "e => e.textContent + e.querySelectorAll('input').length") == "0",
+          f"{name}: drill wiped after 15 min")
+    check(page.evaluate("localStorage.length + sessionStorage.length") == 0 and page.url.rstrip("/") == BASE,
+          f"{name}: drill keeps nothing in storage or the URL")
+
     # Back never shows an old poem.
     page.goto(f"{BASE}/")
     page.click("[data-generate='24']")
@@ -154,6 +201,16 @@ def browser_suite(bt, tmp):
         wait_poem(pg, 24)
         over = pg.evaluate("document.documentElement.scrollHeight - window.innerHeight")
         check(over <= 0, f"{name}: 24-word poem page fits {vw}x{vh} without scrolling (over {over})")
+        pg.click("#drill-btn")
+        ws = poem_words(pg)
+        for _ in range(2):  # two perfect rounds: round 3 makes every word an input
+            pg.eval_on_selector_all("#poem-lines input.drill-word",
+                                    "(els, ws) => els.forEach(e => { var n = e.getAttribute('aria-label').match(/\\d+/g); e.value = ws[(n[0] - 1) * 3 + (n[1] - 1)]; })", ws)
+            pg.click("#check-btn")
+            pg.click("#check-btn")
+        check(pg.eval_on_selector_all("#poem-lines input.drill-word", "e => e.length") == 24, f"{name}: drill round 3 hides every word")
+        over = pg.evaluate("document.documentElement.scrollHeight - window.innerHeight")
+        check(over <= 0, f"{name}: drill on a 24-word poem fits {vw}x{vh} (over {over})")
         pg.close()
 
     # Small screens: no horizontal scrolling.
