@@ -99,6 +99,28 @@ err = seedpoet.Validate(words)     // BIP39 checksum check
 [`js/seedpoet.js`](js/seedpoet.js) is a line-for-line port of the Go library, including its own SHA-256 for
 the checksum, so it also works from a file on an offline computer.
 
+From npm ([`seedpoet`](https://www.npmjs.com/package/seedpoet), word data included):
+
+```bash
+npm install seedpoet
+```
+
+```js
+const SeedPoet = require('seedpoet');
+const poem = SeedPoet.generate(24);           // crypto.getRandomValues
+console.log(poem.format());
+console.log(SeedPoet.validateWords(poem.words())); // null = valid BIP39
+```
+
+Or one script tag from jsDelivr (for a wallet seed, prefer a pinned version with `integrity=` or a copy you host):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/seedpoet@2/seedpoet.full.js"></script>
+<script>console.log(SeedPoet.generate(12).format());</script>
+```
+
+From a checkout, with the data files:
+
 ```html
 <script src="data.js"></script>      <!-- word data: web/dist/assets/data.*.js -->
 <script src="seedpoet.js"></script>
@@ -160,7 +182,7 @@ make generate    # rebuild data/seedpoet.json from the Python word lists
 |---|---|
 | `seedpoet/` | Public Go package |
 | `internal/` | Generator, rhyme index, syllable counter, BIP39 checksum, random number rules, web server |
-| `js/` | JavaScript library and its tests |
+| `js/` | JavaScript library, its tests and the npm package stager (`js/npm/stage.js`, published as `seedpoet` by CI on every tag) |
 | `data/` | Official BIP39 `english.txt` and `seedpoet.json` (word categories, rhyme groups), shared by Go and JS |
 | `web/` | Website templates, CSS/JS sources, generated `dist/`, image and browser-test tools |
 | `cmd/seedpoet` | CLI and server; `cmd/buildweb` builds the website |

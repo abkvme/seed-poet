@@ -132,3 +132,28 @@ jobs:
             SHA256SUMS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  npm:
+    name: Publish npm package seedpoet
+    needs: [release]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # npm trusted publishing (OIDC), no token secret
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Stage package and check the version matches the tag
+        run: |
+          node js/npm/stage.js bin/npm
+          test "v$(node -p "require('./bin/npm/package.json').version")" = "${GITHUB_REF_NAME}"
+      - name: Publish (skip if this version is already on npm)
+        working-directory: bin/npm
+        run: |
+          v=$(node -p "require('./package.json').version")
+          if npm view "seedpoet@$v" version >/dev/null 2>&1; then echo "seedpoet@$v already published"; exit 0; fi
+          npm publish --access public --provenance
