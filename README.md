@@ -188,6 +188,17 @@ make generate    # rebuild data/seedpoet.json from the Python word lists
 | `cmd/seedpoet` | CLI and server; `cmd/buildweb` builds the website |
 | `scripts/` | Python sources of the word categories and rhyme groups |
 
+## Prior art
+
+- **[iambic-mnemonic](https://github.com/ChristopherA/iambic-mnemonic)** by Christopher Allen
+  explored the idea first: random private keys written as iambic, rhymed verse, with words
+  sorted by part of speech and filler words between them to aid memory. Seed Poet takes a
+  narrower path: every word of the poem is a word of the standard BIP39 English list, in order,
+  so the poem itself is the phrase any BIP39 wallet imports, and the Go and JavaScript
+  generators produce the same poem from the same random bytes.
+- Bitcoin Magazine's [New Mnemonics For Memorizing Bitcoin Seed Phrases](https://bitcoinmagazine.com/technical/new-mnemonics-for-bitcoin)
+  surveys other ways to make a seed phrase easier to remember.
+
 ## Related
 
 - **[MnemoSSH](https://github.com/abkvme/mnemossh)**: turns a BIP39 phrase into an Ed25519 SSH

@@ -100,6 +100,9 @@
   <h2>Technology</h2>
   <p>Seed Poet is open source under the MIT license. The generator exists twice, in Go and in plain JavaScript with no dependencies, and both produce exactly the same poem from the same random bytes. This website runs the JavaScript version in your browser. The source code is on <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>.</p>
 
+  <h2 id="prior-art">Prior art</h2>
+  <p>Christopher Allen's <a href="https://github.com/ChristopherA/iambic-mnemonic" rel="noopener">iambic-mnemonic</a> explored the idea first: random private keys written as iambic, rhymed verse, with filler words between the key words to aid memory. Seed Poet takes a narrower path: every word of the poem is a word of the standard BIP39 English list, in order, so the poem itself is the phrase your wallet imports. Bitcoin Magazine's <a href="https://bitcoinmagazine.com/technical/new-mnemonics-for-bitcoin" rel="noopener">New Mnemonics For Memorizing Bitcoin Seed Phrases</a> surveys other ways to make a seed phrase easier to remember.</p>
+
   <div class="cta">
     <a class="btn" href="/?words=12"><span class="k">12</span> words</a>
     <a class="btn" href="/?words=24"><span class="k">24</span> words</a>
@@ -113,7 +116,7 @@
     <a href="/guide/memorize-seed-phrase">Memorizing</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
     <a href="/seedpoet-offline.html" download>Offline version</a>
-    <span>v2.1.9</span>
+    <span>v2.1.10</span>
   </nav>
 </footer>
 <script src="/assets/site.8bce1e819a.js" integrity="sha384-xiZQgrBaaD6MtDyg2utRsIkGRQCaCKykarYEiUH/lqrd8PwF7SvZibePV4Z1TA4B" defer></script>
