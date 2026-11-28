@@ -278,7 +278,7 @@ Seed Poet is free and open source (MIT), developed by OxiSoft (https://oxisoft.i
 ## Links
 - Website: https://seedpoet.com
 - About: https://seedpoet.com/about
-- BIP39 word list grouped by rhyme (all 2048 words): https://seedpoet.com/wordlist
+- BIP39 word list, all 2048 words numbered 1 to 2048 in official order and grouped by rhyme: https://seedpoet.com/wordlist
 - Guide: how to memorize a seed phrase, and when not to (memory as a second copy, never the only backup): https://seedpoet.com/guide/memorize-seed-phrase
 - About and the memorize guide also in Spanish and Portuguese: https://seedpoet.com/es/about, https://seedpoet.com/pt/about, https://seedpoet.com/es/guide/memorize-seed-phrase, https://seedpoet.com/pt/guide/memorize-seed-phrase (the poems stay English: the BIP39 English list is the one wallets import)
 - Offline version: https://seedpoet.com/seedpoet-offline.html

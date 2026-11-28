@@ -37,3 +37,15 @@ func TestEnding(t *testing.T) {
 		}
 	}
 }
+
+func TestWordlistOrderedIsOfficialOrder(t *testing.T) {
+	wl := BuildWordlist()
+	if len(wl.Ordered) != len(data.BIP39) {
+		t.Fatalf("ordered %d, want %d", len(wl.Ordered), len(data.BIP39))
+	}
+	for i, n := range wl.Ordered {
+		if n.N != i+1 || n.Word != data.BIP39[i] {
+			t.Fatalf("entry %d = %d %q, want %d %q", i, n.N, n.Word, i+1, data.BIP39[i])
+		}
+	}
+}

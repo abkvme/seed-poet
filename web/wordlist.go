@@ -21,7 +21,14 @@ type Wordlist struct {
 	Rhymes  []WordGroup // the phonetic rhyme groups Seed Poet uses to end its lines
 	Endings []WordGroup // every other word, grouped by its spelled ending
 	Lone    []string    // words whose spelled ending no other remaining word shares
+	Ordered []Numbered  // the whole list in official order, numbered 1..2048
 	Total   int
+}
+
+// Numbered is one word of the official list with its 1-based number.
+type Numbered struct {
+	N    int
+	Word string
 }
 
 var endingRE = regexp.MustCompile(`[aeiouy]+[^aeiouy]*$`)
@@ -92,6 +99,9 @@ func BuildWordlist() Wordlist {
 		wl.Total += len(g.Words)
 	}
 	wl.Total += len(wl.Lone)
+	for i, w := range data.BIP39 {
+		wl.Ordered = append(wl.Ordered, Numbered{N: i + 1, Word: w})
+	}
 	return wl
 }
 
@@ -103,7 +113,7 @@ func wordlistLD() template.JS {
 				"@type":       "WebPage",
 				"@id":         Site + "/wordlist#page",
 				"url":         Site + "/wordlist",
-				"name":        "BIP39 word list grouped by rhyme",
+				"name":        "BIP39 word list, numbered and grouped by rhyme",
 				"isPartOf":    map[string]string{"@id": Site + "/#website"},
 				"inLanguage":  "en",
 				"description": wordlistDesc,
@@ -119,8 +129,8 @@ func wordlistLD() template.JS {
 	})
 }
 
-const wordlistDesc = "All 2048 words of the BIP39 English word list, grouped by rhyme: the rhyme groups " +
-	"Seed Poet uses for its seed phrase poems, then every other word by its ending."
+const wordlistDesc = "All 2048 BIP39 English words, numbered 1 to 2048 in official order and grouped by " +
+	"rhyme: the groups Seed Poet uses for its seed phrase poems."
 
 var builtWordlist *Wordlist
 

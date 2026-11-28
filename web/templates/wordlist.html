@@ -6,10 +6,10 @@
 {{template "header" .}}
 <main id="main" class="prose wordlist">
   <p class="hud">Seed<span>.</span>Poet <span>//</span> wordlist</p>
-  <h1>BIP39 word list, grouped by rhyme</h1>
+  <h1>BIP39 word list, by rhyme and by number</h1>
 
   <p>BIP39 (Bitcoin Improvement Proposal 39) is the standard that turns a wallet's secret into a recovery phrase of 12 or 24 words. Every word comes from one fixed list of {{.Wordlist.Total}} English words. The first four letters of each word are unique, so a wallet can recognise a word from its start, and the last word carries a checksum.</p>
-  <p>This page shows the whole English list, sorted by sound instead of alphabet. The first part holds the rhyme groups that <a href="/">Seed Poet</a> uses to end the lines of its poems: the nouns at the end of two lines of a couplet always come from the same group. The second part puts every other word next to the words that end the same way.</p>
+  <p>This page shows the whole English list, sorted by sound instead of alphabet. The first part holds the rhyme groups that <a href="/">Seed Poet</a> uses to end the lines of its poems: the nouns at the end of two lines of a couplet always come from the same group. The second part puts every other word next to the words that end the same way. At the end comes the <a href="#numbered">whole list in official order, numbered</a>, for looking up a word's number.</p>
   <p>Never pick seed words yourself: people choose badly and a chosen phrase is easy to guess. Let a generator use real randomness. <a href="/?words=24">Write a 24-word poem</a> and every word on it will be on this list.</p>
 
   <h2 id="rhymes">Rhyme groups used in poems</h2>
@@ -31,6 +31,10 @@
 
   <h2 id="lone">Words with an ending of their own</h2>
   <ul class="words lone">{{range .Wordlist.Lone}}<li>{{.}}</li>{{end}}</ul>
+
+  <h2 id="numbered">All {{.Wordlist.Total}} words in order, numbered</h2>
+  <p>Numbers run from 1 to {{.Wordlist.Total}}, the way most metal backup plates count. Software counts from 0, so its index is one less: abandon is 1 here and 0 in code.</p>
+  <ol class="word-index">{{range .Wordlist.Ordered}}<li><span class="n">{{.N}}</span> {{.Word}}</li>{{end}}</ol>
 
   <p>Source: the official <a href="https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt" rel="noopener">BIP39 English word list</a>. How the poems are built: <a href="/about">About Seed Poet</a>.</p>
 

@@ -231,6 +231,9 @@ def browser_suite(bt, tmp):
     check(len(listed) == 2048 and len(set(listed)) == 2048 and set(listed) == set(M.wordlist),
           f"{name}: /wordlist lists 2048 unique BIP39 words ({len(listed)}, {len(set(listed))} unique)")
     check(pg.get_attribute("link[rel=canonical]", "href") == "https://seedpoet.com/wordlist", f"{name}: /wordlist canonical")
+    ordered = pg.eval_on_selector_all("ol.word-index li", "els => els.map(e => e.textContent.trim().split(/\\s+/))")
+    check(ordered == [[str(i + 1), w] for i, w in enumerate(M.wordlist)],
+          f"{name}: /wordlist numbered list = official order 1..2048 ({len(ordered)})")
     pg.close()
 
     # Memorize guide: static page, canonical, cites the counter-view, linked from the footer.
