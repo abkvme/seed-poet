@@ -3,7 +3,9 @@
 <title>{{.Title}}</title>
 <meta name="description" content="{{.Description}}">
 {{if .Canonical}}<link rel="canonical" href="{{.Canonical}}">
-{{end}}<meta name="robots" content="{{.Robots}}">
+{{end}}{{range .Alternates}}<link rel="alternate" hreflang="{{.Lang}}" href="{{.URL}}">
+{{end}}{{range .Alternates}}{{if eq .Lang "en"}}<link rel="alternate" hreflang="x-default" href="{{.URL}}">
+{{end}}{{end}}<meta name="robots" content="{{.Robots}}">
 <meta name="author" content="OxiSoft">
 <meta name="application-name" content="Seed Poet">
 <meta name="apple-mobile-web-app-title" content="Seed Poet">
@@ -25,7 +27,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Seed Poet: your BIP39 seed phrase as a rhyming poem, generated in your browser">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="{{.Locale}}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{.OGTitle}}">
 <meta name="twitter:description" content="{{.OGDescription}}">
@@ -42,27 +44,28 @@
 {{end}}{{if .JSONLD}}<script type="application/ld+json">{{.JSONLD}}</script>
 {{end}}{{end}}
 
-{{define "header"}}<a class="skip" href="#main">Skip to content</a>
+{{define "header"}}<a class="skip" href="#main">{{.UI.Skip}}</a>
 <header class="site-header">
   <a class="brand" href="{{.Base}}/">{{if .Offline}}<b>&#x2593;</b>{{else}}<img src="/favicon.svg" alt="" width="30" height="30">{{end}}<span>Seed<b>//</b>Poet</span></a>
   <nav class="site-nav" aria-label="Main">
-    <a href="{{.Base}}/"{{if eq .Path "/"}} aria-current="page"{{end}}>Generator</a>
-    <a href="{{.Base}}/about"{{if eq .Path "/about"}} aria-current="page"{{end}}>About</a>
-    <a href="{{.Base}}/wordlist"{{if eq .Path "/wordlist"}} aria-current="page"{{end}}>Wordlist</a>
+    <a href="{{.Base}}/"{{if eq .Key "/"}} aria-current="page"{{end}}>{{.UI.Generator}}</a>
+    <a href="{{.Base}}{{.Root}}/about"{{if eq .Key "/about"}} aria-current="page"{{end}}>{{.UI.About}}</a>
+    <a href="{{.Base}}/wordlist"{{if eq .Key "/wordlist"}} aria-current="page"{{end}}>{{.UI.Wordlist}}</a>
     <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>
   </nav>
 </header>{{end}}
 
 {{define "footer"}}<footer class="site-footer">
-  <p class="credit">Developed by <a href="https://oxisoft.io" rel="noopener">OxiSoft</a></p>
+  <p class="credit">{{.UI.Credit}} <a href="https://oxisoft.io" rel="noopener">OxiSoft</a></p>
   <nav aria-label="Footer">
-    <a href="{{.Base}}/about#privacy">Privacy</a>
-    <a href="{{.Base}}/wordlist">BIP39 word list</a>
-    <a href="{{.Base}}/guide/memorize-seed-phrase">Memorizing</a>
-    <a href="https://github.com/abkvme/seed-poet" rel="noopener">Source code</a>
-    {{if not .Offline}}<a href="/seedpoet-offline.html" download>Offline version</a>
+    <a href="{{.Base}}{{.Root}}/about#privacy">{{.UI.Privacy}}</a>
+    <a href="{{.Base}}/wordlist">{{.UI.WordlistLong}}</a>
+    <a href="{{.Base}}{{.Root}}/guide/memorize-seed-phrase">{{.UI.Memorizing}}</a>
+    <a href="https://github.com/abkvme/seed-poet" rel="noopener">{{.UI.Source}}</a>
+    {{if not .Offline}}<a href="/seedpoet-offline.html" download>{{.UI.Offline}}</a>
     {{end}}<span>v{{.Version}}</span>
-  </nav>
+  </nav>{{if .Alternates}}
+  <nav class="langs" aria-label="{{.UI.Language}}">{{range .Alternates}}<a href="{{.Path}}" hreflang="{{.Lang}}"{{if eq .Path $.Path}} aria-current="page"{{end}}>{{.Name}}</a>{{end}}</nav>{{end}}
 </footer>{{end}}
 
 {{define "strength"}}<button class="strength-btn" type="button" popovertarget="strength-info">&#x26A0; How strong is a poem seed?</button>

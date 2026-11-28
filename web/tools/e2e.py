@@ -217,7 +217,7 @@ def browser_suite(bt, tmp):
     for w in (320, 360, 412):
         pg = ctx.new_page()
         pg.set_viewport_size({"width": w, "height": 740})
-        for path in ("/", "/about", "/wordlist", "/guide/memorize-seed-phrase"):
+        for path in ("/", "/about", "/wordlist", "/guide/memorize-seed-phrase", "/es/about", "/pt/guide/memorize-seed-phrase"):
             pg.goto(BASE + path)
             pg.wait_for_timeout(300)
             over = pg.evaluate("document.documentElement.scrollWidth - window.innerWidth")
@@ -241,7 +241,17 @@ def browser_suite(bt, tmp):
     check(pg.eval_on_selector("h1", "e => e.textContent").startswith("How to memorize a seed phrase"), f"{name}: guide h1")
     check(pg.locator("#when-not").count() == 1 and pg.locator("a[href*='36_Vasek.pdf']").count() == 1,
           f"{name}: guide has the counter-view with sources")
-    check(pg.locator(".site-footer a[href='/guide/memorize-seed-phrase']").count() == 1, f"{name}: guide in footer")
+    check(pg.locator(".site-footer nav[aria-label=Footer] a[href='/guide/memorize-seed-phrase']").count() == 1, f"{name}: guide in footer")
+    # Translations (SP-24): language links in the footer lead to the Spanish and Portuguese versions.
+    pg.click(".site-footer .langs a[hreflang=es]")
+    pg.wait_for_load_state()
+    check(pg.url.endswith("/es/guide/memorize-seed-phrase") and pg.get_attribute("html", "lang") == "es",
+          f"{name}: footer link opens the Spanish guide")
+    check(pg.eval_on_selector("h1", "e => e.textContent").startswith("Cómo memorizar"), f"{name}: Spanish guide h1")
+    pg.goto(BASE + "/pt/about")
+    check(pg.get_attribute("html", "lang") == "pt-BR" and pg.locator("link[hreflang=x-default][href='https://seedpoet.com/about']").count() == 1,
+          f"{name}: Portuguese about with hreflang x-default")
+    check(pg.locator(".site-nav a[aria-current=page][href='/pt/about']").count() == 1, f"{name}: pt nav stays in Portuguese")
     pg.close()
     ctx.close()
 

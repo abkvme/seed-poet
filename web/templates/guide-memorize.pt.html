@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="{{.Lang}}">
+<head>
+{{template "head" .}}</head>
+<body>
+{{template "header" .}}
+<main id="main" class="prose guide">
+  <p class="hud">Seed<span>.</span>Poet <span>//</span> guia</p>
+  <h1>Como memorizar uma frase-semente, e quando não fazer isso</h1>
+
+  <p>Uma frase-semente (frase de recuperação, mnemônico) é a chave mestra de uma carteira de criptomoedas: 12 ou 24 palavras da <a href="{{.Base}}/wordlist">lista de palavras BIP39</a>. Quem tem as palavras tem o dinheiro, e se todas as cópias se perderem, o dinheiro também se perde. Este guia mostra como decorar uma frase e defende que, para a maioria das pessoas, a memória deve ser uma segunda cópia, nunca a única.</p>
+
+  <h2 id="short">A resposta curta</h2>
+  <ul>
+    <li><strong>Sim</strong>, decore a sua frase se isso ajudar: uma frase que você sabe é uma frase que pode conferir com o seu backup, e uma cópia que nenhum ladrão encontra.</li>
+    <li><strong>Não</strong> faça da memória o seu único backup. A memória se apaga, falha sob estresse e morre com você. Guarde pelo menos uma cópia escrita, de preferência gravada em metal, num lugar seguro.</li>
+    <li><strong>Nunca</strong> invente as palavras. Uma frase escolhida por você é uma frase que alguém pode adivinhar. Deixe um gerador com aleatoriedade real escolher e decore o que ele deu.</li>
+  </ul>
+
+  <h2 id="why-hard">Por que é difícil lembrar uma frase-semente</h2>
+  <p>Doze palavras aleatórias não contam história nenhuma: "ritual absurd glance oven..." não dá à mente nada em que se apoiar. A ordem também importa, e as frases BIP39 terminam com uma palavra de verificação, então a carteira recusa a frase se uma palavra estiver trocada ou fora do lugar. A pesquisa sobre memória é direta sobre o que acontece com o que você não revisa: a <a href="https://pt.wikipedia.org/wiki/Curva_do_esquecimento" rel="noopener">curva do esquecimento</a> despenca em poucos dias.</p>
+
+  <h2 id="how">Como memorizar</h2>
+  <ol>
+    <li><strong>Dê uma forma a ela.</strong> Rima, ritmo e imagens são o que as pessoas usam há séculos para guardar textos longos. O <a href="{{.Base}}/">Seed Poet</a> escreve a sua frase como dísticos com rima (verbo, adjetivo, substantivo; os substantivos de cada dístico rimam), então um verso puxa o próximo. Sem o Seed Poet, ligue as palavras numa cena absurda ou espalhe-as pelos cômodos da sua casa (o método de loci, ou <a href="https://pt.wikipedia.org/wiki/Pal%C3%A1cio_da_mem%C3%B3ria" rel="noopener">palácio da memória</a>).</li>
+    <li><strong>Decore em partes.</strong> Um dístico (6 palavras) de cada vez, depois junte tudo. Diga também os números dos versos: as carteiras pedem as palavras na ordem.</li>
+    <li><strong>Teste, não releia.</strong> Lembrar com a resposta escondida funciona melhor do que olhar de novo. O <a href="{{.Root}}/about#drill">Drill</a> do Seed Poet esconde uma palavra por verso, depois duas, depois todas, inteiramente no seu navegador.</li>
+    <li><strong>Espace as revisões.</strong> Relembre no dia seguinte, depois de três dias, uma semana, um mês e então algumas vezes por ano (<a href="https://pt.wikipedia.org/wiki/Repeti%C3%A7%C3%A3o_espa%C3%A7ada" rel="noopener">repetição espaçada</a>). Cada revisão só de memória, conferida em particular com a sua cópia escrita.</li>
+    <li><strong>Nunca treine num dispositivo.</strong> Não digite a frase em notas, chats, gerenciadores de senhas ou apps de flashcards que sincronizam. Treine de cabeça ou num papel que você destrói depois.</li>
+  </ol>
+
+  <h2 id="when-not">Quando não confiar na memória</h2>
+  <p>Aqui está o ponto de vista contrário, e ele está quase todo certo:</p>
+  <ul>
+    <li><strong>A memória se desgasta.</strong> Uma frase de que você tem certeza hoje pode perder uma palavra ou a ordem depois de um ano sem prática. Uma palavra perdida ainda pode ser encontrada testando os 2048 candidatos com ferramentas de recuperação; algumas palavras perdidas deixam os fundos fora de alcance.</li>
+    <li><strong>A memória falha quando você precisa dela.</strong> Doença, acidente, idade, estresse ou simplesmente muito tempo sem revisar podem levá-la embora. Um backup que você não alcança numa crise não é um backup.</li>
+    <li><strong>Memória não se herda.</strong> Se a frase vive só na sua cabeça, a sua família não consegue recuperar os fundos depois de você. Planeje quem terá acesso, e como.</li>
+    <li><strong>As "brain wallets" perderam dinheiro de verdade.</strong> Os primeiros usuários de Bitcoin transformavam em chave uma frase inventada por eles. Pesquisadores testaram cerca de 300 bilhões de palpites e viram que quase todas as carteiras desse tipo que detectaram foram esvaziadas, em geral em menos de um dia (<a href="https://fc16.ifca.ai/preproceedings/36_Vasek.pdf" rel="noopener">Vasek et al., The Bitcoin Brain Drain, 2016</a>; <a href="https://en.bitcoin.it/wiki/Brainwallet" rel="noopener">Bitcoin Wiki: Brainwallet</a>, em inglês). É uma lição sobre frases escolhidas por pessoas. Um poema do Seed Poet é escolhido por uma fonte aleatória criptográfica, não por você, mas ainda é um pouco mais fraco do que uma frase totalmente aleatória: veja <a href="{{.Root}}/about#privacy">qual a força dele</a> e use 24 palavras para valores reais.</li>
+    <li><strong>Valores grandes merecem mais do que a cabeça de uma pessoa.</strong> Para economias de verdade, considere uma carteira de hardware e uma cópia escrita em metal, que resiste ao fogo e à água onde o papel não resiste (<a href="https://jlopp.github.io/metal-bitcoin-storage-reviews/" rel="noopener">testes de resistência de armazenamento em metal de Jameson Lopp</a>, em inglês).</li>
+  </ul>
+
+  <h2 id="passphrase">Um meio-termo: escreva as palavras, lembre a senha</h2>
+  <p>Muitas carteiras aceitam uma senha BIP39 opcional (às vezes chamada de 25ª palavra, definida no <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki" rel="noopener">BIP39</a>). As 24 palavras vão para o papel ou o metal; a senha fica na sua cabeça. Quem encontrar as palavras escritas vê outra carteira, vazia. O mesmo alerta vale ao contrário: se você esquecer a senha, as palavras escritas não abrem mais os seus fundos, então ela precisa do próprio backup seguro para os seus herdeiros.</p>
+
+  <h2 id="checklist">Checklist</h2>
+  <ul>
+    <li>Palavras geradas por aleatoriedade real, nunca escolhidas por você.</li>
+    <li>Pelo menos uma cópia escrita, guardada em local seguro; em metal para valores grandes.</li>
+    <li>A frase nunca digitada num dispositivo que sincroniza nem fotografada.</li>
+    <li>A memória, se você a usa, revisada com regularidade e conferida com a cópia.</li>
+    <li>Alguém de confiança sabe como encontrar o backup se você não puder.</li>
+  </ul>
+
+  <div class="cta">
+    <a class="btn" href="{{.Base}}/?words=12"><span class="k">12</span> palavras</a>
+    <a class="btn" href="{{.Base}}/?words=24"><span class="k">24</span> palavras</a>
+  </div>
+</main>
+{{template "footer" .}}
+{{template "site-scripts" .}}
+</body>
+</html>

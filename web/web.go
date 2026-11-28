@@ -60,6 +60,12 @@ type Page struct {
 	JSONLD        template.JS
 	InSitemap     bool
 	Wordlist      *Wordlist
+	Key           string // English path of the page (nav highlighting); defaults to Path
+	Lang          string // <html lang>
+	Locale        string // og:locale
+	UI            UI     // header and footer strings
+	Root          string // "" for English, "/es" etc. for a translation (links to translated pages)
+	Alternates    []Alt  // language versions incl. this one; empty = English only
 }
 
 // Renderer renders pages with fingerprinted asset URLs (and, for the offline
@@ -136,6 +142,12 @@ func base(p Page) Page {
 	p.Version = seedpoet.Version
 	if p.Robots == "" {
 		p.Robots = "index, follow, max-image-preview:large"
+	}
+	if p.Key == "" {
+		p.Key = p.Path
+	}
+	if p.Lang == "" {
+		p.Lang, p.Locale, p.UI = english.HTML, english.Locale, english.UI
 	}
 	if p.OGTitle == "" {
 		p.OGTitle = p.Title
@@ -226,51 +238,35 @@ func homeLD() template.JS {
 	})
 }
 
-func aboutLD() template.JS {
+func aboutLD(lang, path string, t pageText) template.JS {
 	return ld(map[string]any{
 		"@context": "https://schema.org",
 		"@graph": []any{
 			map[string]any{
 				"@type":       "AboutPage",
-				"@id":         Site + "/about#page",
-				"url":         Site + "/about",
-				"name":        "About Seed Poet",
+				"@id":         Site + path + "#page",
+				"url":         Site + path,
+				"name":        t.OGTitle,
 				"isPartOf":    map[string]string{"@id": Site + "/#website"},
 				"about":       map[string]string{"@id": Site + "/#app"},
-				"inLanguage":  "en",
-				"description": "How Seed Poet turns a BIP39 seed phrase into a rhyming poem, how strong it is, and how it protects your privacy.",
+				"inLanguage":  lang,
+				"description": t.Description,
 			},
-			map[string]any{
-				"@type": "BreadcrumbList",
-				"itemListElement": []any{
-					map[string]any{"@type": "ListItem", "position": 1, "name": "Seed Poet", "item": Site + "/"},
-					map[string]any{"@type": "ListItem", "position": 2, "name": "About", "item": Site + "/about"},
-				},
-			},
+			breadcrumb(lang, path, t.Crumb),
 		},
 	})
 }
 
 // Pages lists every static page of the site. The generator is one page: "/".
 func Pages() []Page {
-	return []Page{
+	pages := []Page{
 		base(Page{Template: "index.html", File: "index.html", Path: "/", Title: homeTitle, Description: homeDesc,
 			OGTitle: ogTitle, OGDescription: ogDesc, Canonical: Site + "/", JSONLD: homeLD(), InSitemap: true}),
-		base(Page{Template: "about.html", File: "about.html", Path: "/about",
-			Title:       "About Seed Poet: How Rhyming BIP39 Seed Phrases Work",
-			Description: "How Seed Poet writes a BIP39 seed phrase as a rhyming poem, which blockchains and wallets accept it, how strong it is, and how it keeps it private.",
-			OGTitle:     "About Seed Poet", OGDescription: ogDesc,
-			Canonical: Site + "/about", JSONLD: aboutLD(), InSitemap: true}),
 		base(Page{Template: "wordlist.html", File: "wordlist.html", Path: "/wordlist",
 			Title:       "BIP39 Word List: All 2048 Words Grouped by Rhyme | Seed Poet",
 			Description: wordlistDesc,
 			OGTitle:     "The BIP39 word list, grouped by rhyme", OGDescription: wordlistDesc,
 			Canonical: Site + "/wordlist", JSONLD: wordlistLD(), InSitemap: true, Wordlist: wordlist()}),
-		base(Page{Template: "guide-memorize.html", File: "guide/memorize-seed-phrase.html", Path: guideMemorizePath,
-			Title:       "How to Memorize a Seed Phrase, and When Not To | Seed Poet",
-			Description: guideMemorizeDesc,
-			OGTitle:     "How to memorize a seed phrase, and when not to", OGDescription: guideMemorizeDesc,
-			Canonical: Site + guideMemorizePath, JSONLD: guideMemorizeLD(), InSitemap: true}),
 		base(Page{Template: "expired.html", File: "expired.html", Path: "/expired",
 			Title: "Poem expired | Seed Poet", Description: "This poem was removed for your safety. Generate a new one.",
 			OGTitle: ogTitle, OGDescription: ogDesc, Robots: "noindex, follow"}),
@@ -283,6 +279,10 @@ func Pages() []Page {
 			OGTitle:     ogTitle, OGDescription: ogDesc, Robots: "noindex, nofollow",
 			Offline: true, Base: Site}),
 	}
+	for _, tp := range translatedPages {
+		pages = append(pages, tp.localized()...)
+	}
+	return pages
 }
 
 // NoJSPage is the server-rendered poem page for browsers without JavaScript.

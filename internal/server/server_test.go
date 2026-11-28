@@ -31,7 +31,8 @@ func do(h http.Handler, method, path string, hdr map[string]string) *httptest.Re
 
 func TestPagesHeadersAndSEO(t *testing.T) {
 	h := handler(t)
-	for _, path := range []string{"/", "/about", "/wordlist", "/guide/memorize-seed-phrase", "/expired"} {
+	for _, path := range []string{"/", "/about", "/wordlist", "/guide/memorize-seed-phrase", "/expired",
+		"/es/about", "/pt/about", "/es/guide/memorize-seed-phrase", "/pt/guide/memorize-seed-phrase"} {
 		rec := do(h, http.MethodGet, path, nil)
 		if rec.Code != http.StatusOK {
 			t.Fatalf("%s: status %d", path, rec.Code)
@@ -60,6 +61,20 @@ func TestPagesHeadersAndSEO(t *testing.T) {
 	for _, want := range []string{`"@type":"WebApplication"`, `rel="canonical" href="https://seedpoet.com/"`, "Bitcoin, Ethereum, Solana", "https://github.com/abkvme/seed-poet"} {
 		if !strings.Contains(home, want) {
 			t.Errorf("/: missing %s", want)
+		}
+	}
+	// Translations (SP-24): own lang, canonical, hreflang to every version + x-default.
+	for path, lang := range map[string]string{"/es/about": "es", "/pt/about": "pt-BR",
+		"/es/guide/memorize-seed-phrase": "es", "/pt/guide/memorize-seed-phrase": "pt-BR",
+		"/about": "en", "/guide/memorize-seed-phrase": "en"} {
+		body := do(h, http.MethodGet, path, nil).Body.String()
+		en := strings.TrimPrefix(strings.TrimPrefix(path, "/es"), "/pt")
+		for _, want := range []string{`<html lang="` + lang + `">`, `rel="canonical" href="https://seedpoet.com` + path + `"`,
+			`hreflang="en" href="https://seedpoet.com` + en + `"`, `hreflang="x-default" href="https://seedpoet.com` + en + `"`,
+			`hreflang="es" href="https://seedpoet.com/es` + en + `"`, `hreflang="pt" href="https://seedpoet.com/pt` + en + `"`} {
+			if !strings.Contains(body, want) {
+				t.Errorf("%s: missing %s", path, want)
+			}
 		}
 	}
 	if !strings.Contains(do(h, http.MethodGet, "/about", nil).Body.String(), `id="blockchains"`) {

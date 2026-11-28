@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="{{.Lang}}">
+<head>
+{{template "head" .}}</head>
+<body>
+{{template "header" .}}
+<main id="main" class="prose">
+  <p class="hud">Seed<span>.</span>Poet <span>//</span> sobre</p>
+  <h1>Sobre o Seed Poet</h1>
+
+  <h2>O que é o Seed Poet?</h2>
+  <p>O Seed Poet é uma ferramenta criativa que escreve poemas com rima usando apenas palavras da lista mnemônica BIP39, as mesmas 2048 palavras usadas para criar as frases-semente das carteiras de criptomoedas. Lido palavra por palavra, cada poema é uma frase BIP39 válida com o checksum correto, então qualquer carteira BIP39 o aceita.</p>
+  <p>Os poemas são em inglês de propósito: a lista BIP39 em inglês é a única que todas as carteiras importam sem problemas. Este texto explica como funciona; o <a href="/">gerador</a> escreve o poema em inglês.</p>
+
+  <h2>Tamanho do poema</h2>
+  <ul>
+    <li><strong>12 palavras:</strong> 4 versos, 2 dísticos</li>
+    <li><strong>24 palavras:</strong> 8 versos, 4 dísticos</li>
+  </ul>
+
+  <h2>O que é BIP39?</h2>
+  <p>O BIP39 (Bitcoin Improvement Proposal 39) define uma lista padrão de 2048 palavras em inglês usada para gerar as frases-semente das carteiras de criptomoedas. As palavras foram escolhidas para serem claras e fáceis de distinguir. Veja <a href="/wordlist">as 2048 palavras agrupadas por rima</a> (em inglês).</p>
+
+  <h2 id="blockchains">Quais blockchains e carteiras?</h2>
+  <p>Um poema do Seed Poet é uma frase de recuperação BIP39 padrão em inglês, então funciona em qualquer carteira que permita importar ou restaurar a partir de uma frase BIP39 de 12 ou 24 palavras. Isso inclui as blockchains mais populares:</p>
+  <ul>
+    <li><strong>Bitcoin</strong> (BTC), além de Litecoin, Dogecoin e Bitcoin Cash</li>
+    <li><strong>Ethereum</strong> (ETH) e redes EVM como Polygon, BNB Chain, Arbitrum, Optimism, Base e Avalanche C-Chain</li>
+    <li><strong>Solana</strong> (SOL)</li>
+    <li><strong>Cardano</strong> (ADA): use 24 palavras, que toda carteira Cardano aceita</li>
+    <li><strong>Polkadot</strong> (DOT), <strong>Cosmos</strong> (ATOM) e <strong>Tron</strong> (TRX)</li>
+  </ul>
+  <p>Entre as carteiras que importam frases BIP39 estão as de hardware, como Ledger e Trezor, e apps como MetaMask, Trust Wallet, Phantom e Exodus. A frase é só a chave mestra: a sua carteira deriva dela os endereços de cada rede. O Monero é a exceção, porque usa o próprio formato de semente de 25 palavras.</p>
+
+  <h2 id="privacy">Privacidade e segurança</h2>
+  <ul>
+    <li>Cada poema é escrito pelo seu navegador, com a fonte aleatória segura do seu dispositivo. Ele nunca é enviado a um servidor: a página do poema nem tem permissão para fazer requisições de rede.</li>
+    <li>O poema nunca é salvo, registrado ou colocado num endereço web. Ninguém mais, nem nenhum robô, consegue abri-lo de novo.</li>
+    <li>Ele é apagado da página após 15 minutos, quando você toca em "hide now" (ocultar agora) ou assim que sai da página, para que a próxima pessoa no mesmo navegador não consiga voltar a ele.</li>
+    <li>Sem cookies, sem rastreamento, sem código de terceiros. Só contamos visitas: a data, a página, o site que trouxe você até aqui e se era um celular ou um computador. Não guardamos o endereço IP nem nada que possa identificar você.</li>
+    <li>Com o JavaScript desligado, você pode pedir ao nosso servidor que escreva o poema. Ele é mostrado uma única vez e nunca é salvo nem registrado.</li>
+    <li>Um poema de 12 palavras tem cerca de 88 bits de aleatoriedade e um de 24 palavras cerca de 176, porque a rima limita a escolha das palavras (uma frase BIP39 totalmente aleatória tem 128 e 256). Mesmo 88 bits são cerca de 3 &times; 10<sup>26</sup> poemas possíveis, muito além de qualquer ataque de força bruta conhecido. Para uma carteira com valor real, use 24 palavras e a <a href="/seedpoet-offline.html" download>versão offline</a>.</li>
+  </ul>
+
+  <h2 id="drill">Drill: aprenda o seu poema</h2>
+  <p>Abaixo de um poema novo, toque em Drill. O Seed Poet esconde uma palavra por verso e você a digita; depois de uma rodada perfeita, esconde duas palavras por verso e, por fim, todas. As respostas erradas aparecem em vermelho ao lado da palavra certa. O exercício roda só no seu navegador: o que você digita nunca é salvo nem enviado, o preenchimento automático e o corretor ficam desligados nesses campos, e tudo é apagado junto com o poema. Rima e ritmo tornam um poema mais fácil de lembrar do que uma lista, mas trate a memória como uma segunda cópia, nunca a única: guarde a cópia em papel. Mais no guia <a href="{{.Root}}/guide/memorize-seed-phrase">como memorizar uma frase-semente, e quando não fazer isso</a>.</p>
+
+  <h2 id="ssh">Também para chaves SSH</h2>
+  <p>Um poema é uma frase BIP39 válida, então pode proteger mais do que uma carteira. O <a href="https://oxisoft.io/open-source/mnemossh/">MnemoSSH</a>, uma ferramenta de código aberto da mesma equipe, transforma uma frase BIP39 numa chave SSH Ed25519. Rode <code>mnemossh restore</code> com as palavras do seu poema e você recupera a mesma chave em qualquer máquina.</p>
+
+  <h2>Tecnologia</h2>
+  <p>O Seed Poet é código aberto sob a licença MIT. O gerador existe duas vezes, em Go e em JavaScript puro sem dependências, e os dois produzem exatamente o mesmo poema a partir dos mesmos bytes aleatórios. Este site roda a versão em JavaScript no seu navegador. O código-fonte está no <a href="https://github.com/abkvme/seed-poet" rel="noopener">GitHub</a>.</p>
+
+  <h2 id="prior-art">Precedentes</h2>
+  <p>O <a href="https://github.com/ChristopherA/iambic-mnemonic" rel="noopener">iambic-mnemonic</a>, de Christopher Allen, explorou a ideia primeiro: chaves privadas aleatórias escritas como versos iâmbicos com rima, com palavras de preenchimento entre as palavras da chave para ajudar a memória. O Seed Poet segue um caminho mais estreito: cada palavra do poema é uma palavra da lista padrão BIP39 em inglês, na ordem, então o próprio poema é a frase que a sua carteira importa. O artigo da Bitcoin Magazine <a href="https://bitcoinmagazine.com/technical/new-mnemonics-for-bitcoin" rel="noopener">New Mnemonics For Memorizing Bitcoin Seed Phrases</a> (em inglês) reúne outras formas de tornar uma frase-semente mais fácil de lembrar.</p>
+
+  <div class="cta">
+    <a class="btn" href="/?words=12"><span class="k">12</span> palavras</a>
+    <a class="btn" href="/?words=24"><span class="k">24</span> palavras</a>
+  </div>
+</main>
+{{template "footer" .}}
+{{template "site-scripts" .}}
+</body>
+</html>

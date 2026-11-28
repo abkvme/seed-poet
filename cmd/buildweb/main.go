@@ -74,7 +74,7 @@ func main() {
 		return string(b), nil
 	})
 	must(err)
-	var sitemap []string
+	var sitemap []web.Page
 	var pageURLs []string
 	for _, p := range web.Pages() {
 		var buf bytes.Buffer
@@ -83,7 +83,7 @@ func main() {
 		}
 		write(filepath.Join(dist, p.File), buf.Bytes())
 		if p.InSitemap {
-			sitemap = append(sitemap, p.URL)
+			sitemap = append(sitemap, p)
 		}
 		if !p.Offline && p.Path != "/404" {
 			pageURLs = append(pageURLs, p.Path)
@@ -233,15 +233,23 @@ Disallow: /expired
 Sitemap: https://seedpoet.com/sitemap.xml
 `
 
-func sitemapXML(urls []string) []byte {
+func sitemapXML(pages []web.Page) []byte {
 	var b strings.Builder
-	b.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + "\n" + `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n")
-	for _, u := range urls {
+	b.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + "\n" +
+		`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">` + "\n")
+	for _, p := range pages {
 		pri := "0.8"
-		if strings.HasSuffix(u, "/") {
+		if strings.HasSuffix(p.URL, "/") {
 			pri = "1.0"
 		}
-		fmt.Fprintf(&b, "  <url>\n    <loc>%s</loc>\n    <changefreq>monthly</changefreq>\n    <priority>%s</priority>\n  </url>\n", u, pri)
+		fmt.Fprintf(&b, "  <url>\n    <loc>%s</loc>\n", p.URL)
+		for _, a := range p.Alternates {
+			fmt.Fprintf(&b, "    <xhtml:link rel=\"alternate\" hreflang=\"%s\" href=\"%s\"/>\n", a.Lang, a.URL)
+			if a.Lang == "en" {
+				fmt.Fprintf(&b, "    <xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"%s\"/>\n", a.URL)
+			}
+		}
+		fmt.Fprintf(&b, "    <changefreq>monthly</changefreq>\n    <priority>%s</priority>\n  </url>\n", pri)
 	}
 	b.WriteString("</urlset>\n")
 	return []byte(b.String())
@@ -272,6 +280,7 @@ Seed Poet is free and open source (MIT), developed by OxiSoft (https://oxisoft.i
 - About: https://seedpoet.com/about
 - BIP39 word list grouped by rhyme (all 2048 words): https://seedpoet.com/wordlist
 - Guide: how to memorize a seed phrase, and when not to (memory as a second copy, never the only backup): https://seedpoet.com/guide/memorize-seed-phrase
+- About and the memorize guide also in Spanish and Portuguese: https://seedpoet.com/es/about, https://seedpoet.com/pt/about, https://seedpoet.com/es/guide/memorize-seed-phrase, https://seedpoet.com/pt/guide/memorize-seed-phrase (the poems stay English: the BIP39 English list is the one wallets import)
 - Offline version: https://seedpoet.com/seedpoet-offline.html
 - Source code: https://github.com/abkvme/seed-poet
 - Developer: https://oxisoft.io
